@@ -1,0 +1,80 @@
+services:
+  traefik:
+    ports:
+      - "8100:80"
+      - "4443:443"
+    networks:
+      development:
+    volumes:
+      # Mount the Docker socket as read-only so Traefik can listen to events
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./.infrastructure/conf/traefik/dev/traefik.yml:/traefik.yml:ro
+      - ./.infrastructure/conf/traefik/dev/traefik-certs.yml:/traefik-certs.yml
+      - ./.infrastructure/conf/traefik/dev/certificates/:/certificates
+
+  php:
+    build:
+      target: development
+      args:
+        USER_ID: ${SPIN_USER_ID}
+        GROUP_ID: ${SPIN_GROUP_ID}
+    volumes:
+      - .:/var/www/html/
+    networks:
+      - development
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.laravel.rule=HostRegexp(`localhost`)"
+      - "traefik.http.routers.laravel.entrypoints=web"
+      - "traefik.http.services.laravel.loadbalancer.server.port=8080"
+      - "traefik.http.services.laravel.loadbalancer.server.scheme=http"
+  
+  node:
+    image: node:20
+    volumes:
+      - .:/usr/src/app/
+    working_dir: /usr/src/app/
+    networks: 
+      - development
+
+  mailpit:
+    image: axllent/mailpit
+    networks:
+      - development
+    ports:
+      - "8020:8020"
+      - "1020:1020"
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cf
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - development
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8101:80"
+    depends_on:
+      - mysql
+    networks:
+      - development
+    
+
+networks:
+  development:
+    name: cf-medcmu_development
+
+volumes:
+  mysql_data:

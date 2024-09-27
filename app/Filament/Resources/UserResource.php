@@ -13,6 +13,9 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\Operators\Operator;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserResource extends Resource
 {
@@ -39,7 +42,11 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    //-> (จะคงรหัสเดิมไว้ถ้าไม่ได้แก้รหัส)
+                    ->afterStateHydrated(function (TextInput $component, $state) {
+                        $component->state('');
+                    })
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => filled($state))
                     ->maxLength(255),
             ]);
     }

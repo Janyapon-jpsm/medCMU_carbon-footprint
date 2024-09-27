@@ -29,17 +29,20 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('ชื่อ'),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('อีเมล'),
                 Forms\Components\Select::make('role')
                     ->options([
-                        'admin' => 'Admin',
-                        'operator' => 'Operator'
+                        'admin' => 'Admin แอดมิน',
+                        'operator' => 'Operator คีย์ข้อมูล'
                     ])
-                    ->required(),
+                    ->required()
+                    ->label('ตำแหน่ง'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->afterStateHydrated(function (TextInput $component, $state) {
@@ -47,7 +50,8 @@ class UserResource extends Resource
                     })
                     ->dehydrateStateUsing(fn($state) => Hash::make($state))
                     ->dehydrated(fn($state) => filled($state))
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('รหัส'),
             ]);
     }
 
@@ -57,13 +61,16 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('ชื่อ'),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('อีเมล'),
                 Tables\Columns\TextColumn::make('role')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('ตำแหน่ง'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -11,7 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
@@ -30,15 +31,20 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->label('อีเมล'),
-                Forms\Components\Select::make('role')
-                    ->required()
-                    ->label('หน้าที่')
-                    ->options([
-                        'operator' => 'Operator',
-                        'admin' => 'Admin',
-                    ]),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->label('หน้าที่'),
                 Forms\Components\TextInput::make('password')
                     ->password()
+                    ->afterStateHydrated(function (TextInput $component, $state) {
+                        $component->state('');
+                    })
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => filled($state))
+                    ->maxLength(255)
                     ->label('รหัส'),
             ]);
     }
@@ -55,17 +61,23 @@ class UserResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->label('อีเมล'),
-                Tables\Columns\TextColumn::make('role')
+                Tables\Columns\TextColumn::make('roles')
                     ->sortable()
                     ->searchable()
-                    ->label('หน้าที่'),
+                    ->label('หน้าที่')
+                    ->getStateUsing(function ($record) {
+                        if (is_string($record->roles)) {
+                            return $record->roles;
+                        }
+                        return $record->roles->pluck('name')->implode(', ');
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role')
                     ->label('หน้าที่')
                     ->options([
-                        'admin' => 'Admin',
-                        'operator' => 'Operator',
+                        'admin' => 'admin',
+                        'operator' => 'operator',
                     ])
             ])
             ->actions([

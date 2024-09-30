@@ -34,8 +34,8 @@ class UserResource extends Resource
                     ->required()
                     ->label('หน้าที่')
                     ->options([
-                        'admin' => 'Admin',
                         'operator' => 'Operator',
+                        'admin' => 'Admin',
                     ]),
                 Forms\Components\TextInput::make('password')
                     ->password()
@@ -49,12 +49,15 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
+                    ->searchable()
                     ->label('ชื่อ'),
                 Tables\Columns\TextColumn::make('email')
                     ->sortable()
+                    ->searchable()
                     ->label('อีเมล'),
                 Tables\Columns\TextColumn::make('role')
                     ->sortable()
+                    ->searchable()
                     ->label('หน้าที่'),
             ])
             ->filters([

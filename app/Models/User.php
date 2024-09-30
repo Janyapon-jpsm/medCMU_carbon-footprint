@@ -11,8 +11,7 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
-    // ,HasRoles, HasPanelShield
+    use HasFactory, Notifiable, HasRoles, HasPanelShield;
 
     /**
      * The attributes that are mass assignable.
@@ -49,12 +48,8 @@ class User extends Authenticatable
         ];
     }
 
-    //public function canAccessPanel(Panel $panel): bool
-    //{
-    //    if ($panel->getId() === 'Admin') {
-    //        return str_ends_with($this->email, '@mail.com') && $this->hasVerifiedEmail();
-    //   }
-
-    //    return true;
-    //}
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return str_ends_with($this->email, '@mail.com') && $this->hasVerifiedEmail();
+    }
 }

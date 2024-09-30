@@ -9,13 +9,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Filters\QueryBuilder\Constraints\Operators\Operator;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Support\Facades\Hash;
-
 
 class UserResource extends Resource
 {
@@ -29,28 +25,20 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255)
                     ->label('ชื่อ'),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
-                    ->maxLength(255)
                     ->label('อีเมล'),
                 Forms\Components\Select::make('role')
-                    ->options([
-                        'admin' => 'Admin แอดมิน',
-                        'operator' => 'Operator คีย์ข้อมูล'
-                    ])
                     ->required()
-                    ->label('ตำแหน่ง'),
+                    ->label('หน้าที่')
+                    ->options([
+                        'admin' => 'Admin',
+                        'operator' => 'Operator',
+                    ]),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->afterStateHydrated(function (TextInput $component, $state) {
-                        $component->state('');
-                    })
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                    ->dehydrated(fn($state) => filled($state))
-                    ->maxLength(255)
                     ->label('รหัส'),
             ]);
     }
@@ -60,28 +48,22 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable()
                     ->sortable()
                     ->label('ชื่อ'),
                 Tables\Columns\TextColumn::make('email')
-                    ->searchable()
                     ->sortable()
                     ->label('อีเมล'),
                 Tables\Columns\TextColumn::make('role')
-                    ->searchable()
                     ->sortable()
-                    ->label('ตำแหน่ง'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('หน้าที่'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('role')
+                    ->label('หน้าที่')
+                    ->options([
+                        'admin' => 'Admin',
+                        'operator' => 'Operator',
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -92,7 +74,7 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->label('ลบ'),
+                        ->label('ลบทั้งหมด'),
                 ]),
             ]);
     }

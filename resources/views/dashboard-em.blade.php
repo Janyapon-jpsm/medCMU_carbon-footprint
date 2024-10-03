@@ -36,24 +36,32 @@
     }
 
     .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        padding: 8px;
+        width: 100%;
         background-color: #01696E;
-        padding: 15px;
+        text-align: center;
+
     }
 
-    /*.chart-container {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin-top: 20px;
+    .section-title {
+        text-align: center;
+        color: #2c7873;
+        margin-top: 40px;
+        font-size: 24px;
+        font-weight: bold;
     }
 
-    .progress-bar {
+    /*.progress-bar {
         display: flex;
         height: 30px;
-        background-color: #e0e0e0;
+        background-color: #20B2AA;
         border-radius: 15px;
         overflow: hidden;
         margin-top: 20px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .progress-bar-fill {
@@ -63,18 +71,46 @@
         justify-content: center;
         color: white;
         transition: width 0.5s ease-in-out;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
-
+*/
     .carbon-value {
         text-align: center;
-        font-size: 24px;
-        margin-top: 20px;
+        font-size: 36px;
+        margin-top: 40px;
+        color: #2c7873;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .carbon-unit {
-        font-size: 14px;
+        font-size: 18px;
         color: #666;
-    }*/
+    }
+
+    .icon-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+    }
+
+    .icon-item {
+        text-align: center;
+        margin-top: 20px;
+        color: #2c7873;
+    }
+
+    .icon-item i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        text-align: center;
+        color: #2c7873;
+        margin-top: 40px;
+        font-size: 24px;
+        font-weight: bold;
+    }
 </style>
 </head>
 
@@ -86,6 +122,30 @@
         <h3><b>คาร์บอนฟุตพริ้นท์ คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่</b></h3>
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
+        <!-- <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% ลดการปล่อยคาร์บอน</div>
+            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% ปล่อยคาร์บอน</div>
+        </div> -->
+        <div class="icon-container">
+            <div class="icon-item">
+                <i class="fas fa-tree"></i>
+                <p>ปลูกต้นไม้</p>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-solar-panel"></i>
+                <p>พลังงานสะอาด</p>
+            </div>
+            <div class="icon-item">
+                <i class="fas fa-recycle"></i>
+                <p>รีไซเคิล</p>
+            </div>
+        </div>
+        <div class="carbon-value">
+            00,000.00
+            <span class="carbon-unit">TonCO2-eq</span>
+        </div>
 </body>
 <footer>
     <div class="footer">

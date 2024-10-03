@@ -88,15 +88,14 @@
     }
 
     .button-emission {
-        background-color: #20B2AA;
-        color: white;
+        background-color: #D5D5D5;
+        color: black;
         border: none;
-
     }
 
     .button-reduction {
-        background-color: #D5D5D5;
-        color: black;
+        background-color: #20B2AA;
+        color: white;
         border: none;
     }
 
@@ -177,9 +176,8 @@
             <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button-emission">การปล่อยคาร์บอน (CO2)</button>
             <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
         </div>
-
         <div class="carbon-value">
-            10,000.00
+            00,000.00
             <span class="carbon-unit">TonCO2-eq</span>
         </div>
 </body>

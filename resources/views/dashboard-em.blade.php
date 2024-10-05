@@ -18,10 +18,11 @@
     .container {
         max-width: 800px;
         margin: 0 auto;
-        padding: 20px;
     }
 
     .header {
+        position: sticky;
+        top: 0;
         background-color: #01696E;
         color: white;
         padding: 8px;
@@ -36,14 +37,21 @@
     }
 
     .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        padding: 8px;
+        margin-top: 40px;
+        padding: 10px 0;
         width: 100%;
+        position: relative;
         background-color: #01696E;
+        color: #D5D5D5;
         text-align: center;
+    }
 
+    .chart-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .section-title {
@@ -84,32 +92,62 @@
         text-decoration: none;
         font-size: 18px;
         margin: 4px 2px;
+
+    }
+
+    .button {
+        border: none;
+        border-radius: 25px;
+        transition: 0.3s;
         cursor: pointer;
     }
 
-    .button-emission {
+    .button:active {
         background-color: #20B2AA;
-        color: white;
-        border: none;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+    }
 
+    .button-reduction:hover {
+        opacity: 1;
+        background-color: #2c7873;
+    }
+
+    .button-emission {
+        background-color: #D5D5D5;
+        color: black;
+        padding: 30px;
     }
 
     .button-reduction {
-        background-color: #D5D5D5;
-        color: black;
-        border: none;
+        background-color: #20B2AA;
+        color: white;
+        padding: 12px;
     }
 
-    /* Hover effects for better interactivity */
-    .button:hover {
-        opacity: 0.9;
+
+
+    .show-carbon {
+        margin: 40px auto;
+        border: 2px solid #01696E;
+        border-radius: 100px;
+        padding: 20px;
+        max-width: 40%;
+        text-align: center;
+
+    }
+
+    .carbon-type {
+        text-align: center;
+        font-size: 18px;
+        color: #01696E;
     }
 
     .carbon-value {
+        margin-top: 10px;
         text-align: center;
         font-size: 36px;
-        margin-top: 40px;
-        color: #2c7873;
+        color: #20B2AA;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
@@ -154,39 +192,47 @@
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
     <div class="container">
-        <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
-        <!-- <div class="progress-bar">
+        <div class="chart-container">
+            <canvas id="carbonChart"></canvas>
+        </div>
+        <div class="container">
+            <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
+            <!-- <div class="progress-bar">
             <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% ลดการปล่อยคาร์บอน</div>
             <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% ปล่อยคาร์บอน</div>
-        </div> -->
-        <div class="icon-container">
-            <div class="icon-item">
-                <i class="fas fa-tree"></i>
-                <p>ปลูกต้นไม้</p>
+            </div> -->
+            <div class="icon-container">
+                <div class="icon-item">
+                    <i class="fas fa-tree"></i>
+                    <p>ปลูกต้นไม้</p>
+                </div>
+                <div class="icon-item">
+                    <i class="fas fa-solar-panel"></i>
+                    <p>พลังงานสะอาด</p>
+                </div>
+                <div class="icon-item">
+                    <i class="fas fa-recycle"></i>
+                    <p>รีไซเคิล</p>
+                </div>
             </div>
-            <div class="icon-item">
-                <i class="fas fa-solar-panel"></i>
-                <p>พลังงานสะอาด</p>
+            <div class="button-container">
+                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (CO2)</button>
+                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
             </div>
-            <div class="icon-item">
-                <i class="fas fa-recycle"></i>
-                <p>รีไซเคิล</p>
+            <div class="show-carbon">
+                <div class="carbon-type">การปล่อยคาร์บอน (CO2)</div>
+                <div class="carbon-value">
+                    00,000.00
+                    <span class="carbon-unit">TonCO2-eq</span>
+                </div>
             </div>
         </div>
-        <div class="button-container">
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button-emission">การปล่อยคาร์บอน (CO2)</button>
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
-        </div>
-
-        <div class="carbon-value">
-            10,000.00
-            <span class="carbon-unit">TonCO2-eq</span>
-        </div>
-</body>
-<footer>
-    <div class="footer">
-        <h1></h1>
     </div>
-</footer>
+    <footer class="footer">
+        <p>© 2024 Janyapon Saingam. All rights reserved.</p>
+        <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
+    </footer>
+
+</body>
 
 </html>

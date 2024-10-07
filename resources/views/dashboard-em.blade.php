@@ -228,11 +228,76 @@
             </div>
         </div>
     </div>
+    <script>
+        // Carbon Footprint Chart
+        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
+        new Chart(carbonCtx, {
+            type: 'line',
+            data: {
+                labels: ['2022', '2023'],
+                datasets: [{
+                    label: 'การปล่อยคาร์บอน (CO2)',
+                    data: [50, 20],
+                    borderColor: '#ff6b6b',
+                    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                    fill: true,
+                    tension: 0.4 // Adjust this value for smoothness
+                }, {
+                    label: 'การลดการปล่อยคาร์บอน (CO2)',
+                    data: [20, 15],
+                    borderColor: '#4ecdc4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                    fill: true,
+                    tension: 0.4 // Adjust this value for smoothness
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Footprint Over Time'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw;
+                                return label + ' metric tons';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Carbon Emissions (Metric Tons)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
     <footer class="footer">
         <p>© 2024 Janyapon Saingam. All rights reserved.</p>
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
     </footer>
-
 </body>
 
 </html>

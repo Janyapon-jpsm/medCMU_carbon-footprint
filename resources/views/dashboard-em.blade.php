@@ -50,8 +50,10 @@
         background-color: white;
         border-radius: 8px;
         padding: 20px;
-        margin-top: 20px;
+        margin: 20px auto;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 900px;
+        text-align: center;
     }
 
     .section-title {
@@ -62,13 +64,12 @@
         font-weight: bold;
     }
 
-    /*.progress-bar {
+    .progress-bar {
         display: flex;
         height: 30px;
         background-color: #20B2AA;
         border-radius: 15px;
         overflow: hidden;
-        margin-top: 20px;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
@@ -81,7 +82,7 @@
         transition: width 0.5s ease-in-out;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
-*/
+
     .button-container {
         display: flex;
         gap: 200px;
@@ -132,7 +133,7 @@
         border: 2px solid #01696E;
         border-radius: 100px;
         padding: 20px;
-        max-width: 40%;
+        max-width: 20%;
         text-align: center;
 
     }
@@ -191,53 +192,52 @@
         <h3><b>คาร์บอนฟุตพริ้นท์ คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่</b></h3>
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
+    <div class="chart-container">
+        <canvas id="carbonChart"></canvas>
+    </div>
     <div class="container">
-        <div class="chart-container">
-            <canvas id="carbonChart"></canvas>
+        <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% การลดการปล่อยคาร์บอน</div>
+            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% การปล่อยคาร์บอน</div>
         </div>
-        <div class="container">
-            <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
-            <!-- <div class="progress-bar">
-            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% ลดการปล่อยคาร์บอน</div>
-            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% ปล่อยคาร์บอน</div>
-            </div> -->
-            <div class="icon-container">
-                <div class="icon-item">
-                    <i class="fas fa-tree"></i>
-                    <p>ปลูกต้นไม้</p>
-                </div>
-                <div class="icon-item">
-                    <i class="fas fa-solar-panel"></i>
-                    <p>พลังงานสะอาด</p>
-                </div>
-                <div class="icon-item">
-                    <i class="fas fa-recycle"></i>
-                    <p>รีไซเคิล</p>
-                </div>
+        <div class="icon-container">
+            <div class="icon-item">
+                <i class="fas fa-tree"></i>
+                <p>ปลูกต้นไม้</p>
             </div>
-            <div class="button-container">
-                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (CO2)</button>
-                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
+            <div class="icon-item">
+                <i class="fas fa-solar-panel"></i>
+                <p>พลังงานสะอาด</p>
             </div>
-            <div class="show-carbon">
-                <div class="carbon-type">การปล่อยคาร์บอน (CO2)</div>
-                <div class="carbon-value">
-                    00,000.00
-                    <span class="carbon-unit">TonCO2-eq</span>
-                </div>
+            <div class="icon-item">
+                <i class="fas fa-recycle"></i>
+                <p>รีไซเคิล</p>
             </div>
+        </div>
+        <div class="button-container">
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (CO2)</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
         </div>
     </div>
+    <div class="show-carbon">
+        <div class="carbon-type">การปล่อยคาร์บอน (CO2)</div>
+        <div class="carbon-value">
+            00,000.00
+            <span class="carbon-unit">TonCO2-eq</span>
+        </div>
+    </div>
+
     <script>
         // Carbon Footprint Chart
         const carbonCtx = document.getElementById('carbonChart').getContext('2d');
         new Chart(carbonCtx, {
             type: 'line',
             data: {
-                labels: ['2022', '2023'],
+                labels: ['2565', '2566'],
                 datasets: [{
                     label: 'การปล่อยคาร์บอน (CO2)',
-                    data: [50, 20],
+                    data: [50, 45],
                     borderColor: '#ff6b6b',
                     backgroundColor: 'rgba(255, 107, 107, 0.2)',
                     fill: true,
@@ -279,13 +279,19 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Year'
+                            text: 'Year',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Carbon Emissions (Metric Tons)'
+                            text: 'Carbon Emissions (TonCO2-eq)',
+                            font: {
+                                weight: 'bold'
+                            }
                         },
                         beginAtZero: true
                     }

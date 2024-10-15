@@ -196,7 +196,10 @@
 
 <body>
     <div class="header">
-        <h1><i class="fas fa-leaf"></i><b> Carbon Footprint</b></h1>
+        <h1>
+            <!-- สร้างfolder images ใน folder public <img class="logo" src="\images(ชื่อfolder)\footer(ชื่อsub-folder)\sedla.png(ชื่อไฟล์รูป)" alt="" /> -->
+            <i class="fas fa-leaf"></i><b> Carbon Footprint</b>
+        </h1>
     </div>
     <div class="sub-header">
         <h3><b>คาร์บอนฟุตพริ้นท์ คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่</b></h3>
@@ -208,6 +211,7 @@
     <div class="container">
         <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
         <div class="progress-bar">
+            <!-- connect width % to the database -->
             <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% การลดการปล่อยคาร์บอน</div>
             <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% การปล่อยคาร์บอน</div>
         </div>
@@ -246,21 +250,21 @@
         new Chart(carbonCtx, {
             type: 'line',
             data: {
-                labels: ['2565', '2566'],
+                labels: ['2565', '2566'], //connect database
                 datasets: [{
                     label: 'การปล่อยคาร์บอน (CO2)',
-                    data: [50, 45],
+                    data: [50, 45, ], //connect database
                     borderColor: '#ff6b6b',
                     backgroundColor: 'rgba(255, 107, 107, 0.2)',
                     fill: true,
-                    tension: 0.4 // Adjust this value for smoothness
+                    tension: 0.4
                 }, {
                     label: 'การลดการปล่อยคาร์บอน (CO2)',
-                    data: [20, 15],
+                    data: [20, 15, ], //connect database
                     borderColor: '#4ecdc4',
                     backgroundColor: 'rgba(78, 205, 196, 0.2)',
                     fill: true,
-                    tension: 0.4 // Adjust this value for smoothness
+                    tension: 0.4
                 }]
             },
             options: {
@@ -305,15 +309,16 @@
                                 weight: 'bold'
                             }
                         },
-                        beginAtZero: true
+                        beginAtZero: true,
+                        max: 100
                     }
                 }
             }
         });
 
-        //bar chart
-        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-        const yValues = [55, 49, 44, 24, 15];
+        //bar chart (ex)
+        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"]; //connect database
+        const yValues = [55, 49, 44, 24, 15]; //connect database
         const barColors = ["blue"];
 
         new Chart("myChart", {
@@ -335,6 +340,9 @@
                             beginAtZero: true
                         }
                     }],
+                    y: {
+                        max: 100
+                    }
                 }
             }
         });

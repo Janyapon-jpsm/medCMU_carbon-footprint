@@ -181,6 +181,16 @@
         font-size: 24px;
         font-weight: bold;
     }
+
+    .bar-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 1200px;
+        text-align: center;
+    }
 </style>
 </head>
 
@@ -227,7 +237,9 @@
             <span class="carbon-unit">TonCO2-eq</span>
         </div>
     </div>
-
+    <div class="bar-container">
+        <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
+    </div>
     <script>
         // Carbon Footprint Chart
         const carbonCtx = document.getElementById('carbonChart').getContext('2d');
@@ -295,6 +307,34 @@
                         },
                         beginAtZero: true
                     }
+                }
+            }
+        });
+
+        //bar chart
+        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+        const yValues = [55, 49, 44, 24, 15];
+        const barColors = ["blue"];
+
+        new Chart("myChart", {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
                 }
             }
         });

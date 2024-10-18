@@ -1,3 +1,11 @@
+<?php
+$username = "root";
+$password = "";
+$database = "cf";
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,8 +58,10 @@
         background-color: white;
         border-radius: 8px;
         padding: 20px;
-        margin-top: 20px;
+        margin: 20px auto;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 900px;
+        text-align: center;
     }
 
     .section-title {
@@ -62,13 +72,12 @@
         font-weight: bold;
     }
 
-    /*.progress-bar {
+    .progress-bar {
         display: flex;
         height: 30px;
         background-color: #20B2AA;
         border-radius: 15px;
         overflow: hidden;
-        margin-top: 20px;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
@@ -81,7 +90,7 @@
         transition: width 0.5s ease-in-out;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
-*/
+
     .button-container {
         display: flex;
         gap: 200px;
@@ -132,7 +141,7 @@
         border: 2px solid #01696E;
         border-radius: 100px;
         padding: 20px;
-        max-width: 40%;
+        max-width: 20%;
         text-align: center;
 
     }
@@ -180,59 +189,206 @@
         font-size: 24px;
         font-weight: bold;
     }
+
+    .bar-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin: auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 1200px;
+        text-align: center;
+    }
 </style>
 </head>
 
 <body>
     <div class="header">
-        <h1><i class="fas fa-leaf"></i><b> Carbon Footprint</b></h1>
+        <h1>
+            <!-- สร้างfolder images ใน folder public <img class="logo" src="\images(ชื่อfolder)\footer(ชื่อsub-folder)\sedla.png(ชื่อไฟล์รูป)" alt="" /> -->
+            <i class="fas fa-leaf"></i><b> Carbon Footprint</b>
+        </h1>
     </div>
     <div class="sub-header">
         <h3><b>คาร์บอนฟุตพริ้นท์ คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่</b></h3>
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
+    <div class="chart-container">
+        <canvas id="carbonChart"></canvas>
+    </div>
     <div class="container">
-        <div class="chart-container">
-            <canvas id="carbonChart"></canvas>
+        <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
+        <div class="progress-bar">
+            <!-- connect width % to the database -->
+            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% การลดการปล่อยคาร์บอน</div>
+            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% การปล่อยคาร์บอน</div>
         </div>
-        <div class="container">
-            <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
-            <!-- <div class="progress-bar">
-            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% ลดการปล่อยคาร์บอน</div>
-            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% ปล่อยคาร์บอน</div>
-            </div> -->
-            <div class="icon-container">
-                <div class="icon-item">
-                    <i class="fas fa-tree"></i>
-                    <p>ปลูกต้นไม้</p>
-                </div>
-                <div class="icon-item">
-                    <i class="fas fa-solar-panel"></i>
-                    <p>พลังงานสะอาด</p>
-                </div>
-                <div class="icon-item">
-                    <i class="fas fa-recycle"></i>
-                    <p>รีไซเคิล</p>
-                </div>
+        <div class="icon-container">
+            <div class="icon-item">
+                <i class="fas fa-tree"></i>
+                <p>ปลูกต้นไม้</p>
             </div>
-            <div class="button-container">
-                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (CO2)</button>
-                <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
+            <div class="icon-item">
+                <i class="fas fa-solar-panel"></i>
+                <p>พลังงานสะอาด</p>
             </div>
-            <div class="show-carbon">
-                <div class="carbon-type">การปล่อยคาร์บอน (CO2)</div>
-                <div class="carbon-value">
-                    10,000.00
-                    <span class="carbon-unit">TonCO2-eq</span>
-                </div>
+            <div class="icon-item">
+                <i class="fas fa-recycle"></i>
+                <p>รีไซเคิล</p>
             </div>
+        </div>
+        <div class="button-container">
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (CO2)</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (CO2)</button>
         </div>
     </div>
+    <div class="show-carbon">
+        <div class="carbon-type">การปล่อยคาร์บอน (CO2)</div>
+        <div class="carbon-value">
+            00,000.00
+            <span class="carbon-unit">TonCO2-eq</span>
+        </div>
+    </div>
+    <div class="bar-container">
+        <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
+    </div>
+    <script>
+        // Carbon Footprint Chart
+        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
+        new Chart(carbonCtx, {
+            type: 'line',
+            data: {
+                labels: ['2565', '2566'], //connect database
+                datasets: [{
+                    label: 'การปล่อยคาร์บอน (CO2)',
+                    data: [50, 45, ], //connect database
+                    borderColor: '#ff6b6b',
+                    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'การลดการปล่อยคาร์บอน (CO2)',
+                    data: [25, 20, ], //connect database
+                    borderColor: '#4ecdc4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Footprint Over Time'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw;
+                                return label + ' metric tons';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Carbon Emissions (TonCO2-eq)',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+
+
+        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+        const yValues = [55, 49, 44, 24, 15];
+
+        // Function to adjust color lightness
+        function adjustColor(color, amount) {
+            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+        }
+
+        // Sort yValues to determine top 3
+        const indexedValues = yValues.map((value, index) => ({
+            value,
+            index
+        }));
+        indexedValues.sort((a, b) => b.value - a.value);
+
+        const baseColor = "#20B2AA";
+        const barColors = new Array(yValues.length).fill("#D3D3D3");
+
+        // Assign colors to top 3
+        barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
+        barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
+        barColors[indexedValues[2].index] = baseColor;
+
+        new Chart("myChart", {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Carbon Footprint by Country'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Carbon Footprint (metric tons)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Country'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
     <footer class="footer">
         <p>© 2024 Janyapon Saingam. All rights reserved.</p>
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
     </footer>
-
 </body>
 
 </html>

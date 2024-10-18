@@ -1,3 +1,11 @@
+<?php
+$username = "root";
+$password = "";
+$database = "cf";
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +14,7 @@
 <title>Carbon Footprint - MedCMU</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+
 <style>
     body {
         font-family: 'Kanit', Arial, sans-serif;
@@ -26,7 +35,7 @@
         background-color: #01696E;
         color: white;
         padding: 8px;
-        text-align: center;
+        text-align: left;
     }
 
     .sub-header {
@@ -197,8 +206,7 @@
 <body>
     <div class="header">
         <h1>
-            <!-- สร้างfolder images ใน folder public <img class="logo" src="\images(ชื่อfolder)\footer(ชื่อsub-folder)\sedla.png(ชื่อไฟล์รูป)" alt="" /> -->
-            <i class="fas fa-leaf"></i><b> Carbon Footprint</b>
+            <img class="logo" src="\images\logo-med.png" /> <b>Carbon Footprint </b> <i class="fas fa-leaf"></i>
         </h1>
     </div>
     <div class="sub-header">
@@ -260,7 +268,7 @@
                     tension: 0.4
                 }, {
                     label: 'การลดการปล่อยคาร์บอน (CO2)',
-                    data: [20, 15, ], //connect database
+                    data: [25, 20, ], //connect database
                     borderColor: '#4ecdc4',
                     backgroundColor: 'rgba(78, 205, 196, 0.2)',
                     fill: true,
@@ -310,16 +318,34 @@
                             }
                         },
                         beginAtZero: true,
-                        max: 100
                     }
                 }
             }
         });
 
-        //bar chart (ex)
-        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"]; //connect database
-        const yValues = [55, 49, 44, 24, 15]; //connect database
-        const barColors = ["blue"];
+
+        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+        const yValues = [55, 49, 44, 24, 15];
+
+        // Function to adjust color lightness
+        function adjustColor(color, amount) {
+            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+        }
+
+        // Sort yValues to determine top 3
+        const indexedValues = yValues.map((value, index) => ({
+            value,
+            index
+        }));
+        indexedValues.sort((a, b) => b.value - a.value);
+
+        const baseColor = "#20B2AA";
+        const barColors = new Array(yValues.length).fill("#D3D3D3");
+
+        // Assign colors to top 3
+        barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
+        barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
+        barColors[indexedValues[2].index] = baseColor;
 
         new Chart("myChart", {
             type: "bar",
@@ -331,17 +357,38 @@
                 }]
             },
             options: {
-                legend: {
-                    display: false
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Carbon Footprint by Country',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
                 },
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
                     y: {
-                        max: 100
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Carbon Footprint (metric tons)',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Country',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
                     }
                 }
             }
@@ -353,5 +400,6 @@
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
     </footer>
 </body>
+
 
 </html>

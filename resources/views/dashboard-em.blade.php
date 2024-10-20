@@ -14,6 +14,8 @@ $database = "cf";
 <title>Carbon Footprint - MedCMU</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+<script src="https://jsuites.net/v4/jsuites.js"></script>
+<link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
 
 <style>
     body {
@@ -183,6 +185,11 @@ $database = "cf";
         margin-bottom: 10px;
     }
 
+    .monthpicker {
+        text-align: center;
+        padding-bottom: 40px;
+    }
+
     .section-title {
         text-align: center;
         color: #2c7873;
@@ -248,6 +255,9 @@ $database = "cf";
             00,000.00
             <span class="carbon-unit">TonCO2-eq</span>
         </div>
+    </div>
+    <div class="monthpicker">
+        <input id='calendar' />
     </div>
     <div class="bar-container">
         <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
@@ -323,9 +333,16 @@ $database = "cf";
             }
         });
 
+        //calendar
+        jSuites.calendar(document.getElementById('calendar'), {
+            type: 'year-month-picker',
+            format: 'MMM-YYYY',
+            validRange: ['2024-02-01', '2025-12-31']
+        });
 
-        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-        const yValues = [55, 49, 44, 24, 15];
+        //bar chart
+        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้พลังงาน", "CF ทางอ้อมอื่นๆ"];
+        const yValues = [55, 49, 44, 15];
 
         // Function to adjust color lightness
         function adjustColor(color, amount) {
@@ -363,7 +380,7 @@ $database = "cf";
                     },
                     title: {
                         display: true,
-                        text: 'Carbon Footprint by Country',
+                        text: 'Carbon Footprint by Type',
                         font: {
                             weight: 'bold'
                         }
@@ -384,7 +401,7 @@ $database = "cf";
                     x: {
                         title: {
                             display: true,
-                            text: 'Country',
+                            text: 'Type',
                             font: {
                                 weight: 'bold'
                             }

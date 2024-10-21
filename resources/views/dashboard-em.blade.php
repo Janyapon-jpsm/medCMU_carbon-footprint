@@ -12,10 +12,24 @@ $database = "cf";
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carbon Footprint - MedCMU</title>
+
+<!-- Load jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Then load jQuery UI -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<!-- Then load Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+<!-- Other scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-<script src="https://jsuites.net/v4/jsuites.js"></script>
-<link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+<script src="monthpicker.js"></script>
+
+
+<link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
 
 <style>
     body {
@@ -23,7 +37,7 @@ $database = "cf";
         margin: 0;
         padding: 0;
         background-color: #f0f0f0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.6'%3E%3Ccircle cx='5' cy='5' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     .container {
@@ -163,6 +177,15 @@ $database = "cf";
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
+    .monthpicker {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .calendar-icon {
+        color: #01696E;
+    }
+
     .carbon-unit {
         font-size: 18px;
         color: #666;
@@ -183,11 +206,6 @@ $database = "cf";
     .icon-item i {
         font-size: 48px;
         margin-bottom: 10px;
-    }
-
-    .monthpicker {
-        text-align: center;
-        padding-bottom: 40px;
     }
 
     .section-title {
@@ -257,7 +275,11 @@ $database = "cf";
         </div>
     </div>
     <div class="monthpicker">
-        <input id='calendar' />
+        <!-- Month Picker Input -->
+        <input id="monthpicker" type="text" placeholder="Select Month and Year">
+        <span class="calendar-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </span>
     </div>
     <div class="bar-container">
         <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
@@ -333,15 +355,30 @@ $database = "cf";
             }
         });
 
-        //calendar
-        jSuites.calendar(document.getElementById('calendar'), {
-            type: 'year-month-picker',
-            format: 'MMM-YYYY',
-            validRange: ['2024-02-01', '2025-12-31']
+        // Month picker initialization
+        $("#monthpicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'MM yy',
+            onClose: function(dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+            }
         });
 
-        //bar chart
-        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้พลังงาน", "CF ทางอ้อมอื่นๆ"];
+        $("#monthpicker").focus(function() {
+            $(".ui-datepicker-calendar").hide();
+            $("#ui-datepicker-div").position({
+                my: "center top",
+                at: "center bottom",
+                of: $(this)
+            });
+        });
+
+        // Bar chart
+        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้��ลังงาน", "CF ทางอ้อมอื่นๆ"];
         const yValues = [55, 49, 44, 15];
 
         // Function to adjust color lightness

@@ -378,7 +378,7 @@ $database = "cf";
         });
 
         // Bar chart
-        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้��ลังงาน", "CF ทางอ้อมอื่นๆ"];
+        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้พลังงาน", "CF ทางอ้อมอื่นๆ"];
         const yValues = [55, 49, 44, 15];
 
         // Function to adjust color lightness

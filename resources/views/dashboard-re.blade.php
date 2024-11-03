@@ -12,15 +12,32 @@ $database = "cf";
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carbon Footprint - MedCMU</title>
+
+<!-- Load jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Then load jQuery UI -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<!-- Then load Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+<!-- Other scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+
+<script src="monthpicker.js"></script>
+
+
+<link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
+
 <style>
     body {
         font-family: 'Kanit', Arial, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f0f0f0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.6'%3E%3Ccircle cx='5' cy='5' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     .container {
@@ -33,9 +50,22 @@ $database = "cf";
         top: 0;
         background-color: #01696E;
         color: white;
-        padding: 8px;
-        text-align: center;
+        padding: 20px;
+        display: flex;
+        align-items: center;
     }
+
+    .header h1 {
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    .logo {
+        max-height: 40px;
+        margin-right: 10px;
+    }
+
 
     .sub-header {
         background-color: #20B2AA;
@@ -117,6 +147,12 @@ $database = "cf";
         transform: translateY(4px);
     }
 
+    .button:active {
+        background-color: #20B2AA;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+    }
+
     .button-emission:hover {
         opacity: 1;
         background-color: #2c7873;
@@ -133,8 +169,6 @@ $database = "cf";
         color: white;
         padding: 30px;
     }
-
-
 
     .show-carbon {
         margin: 40px auto;
@@ -158,6 +192,15 @@ $database = "cf";
         font-size: 36px;
         color: #20B2AA;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .monthpicker {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .calendar-icon {
+        color: #01696E;
     }
 
     .carbon-unit {
@@ -205,8 +248,7 @@ $database = "cf";
 <body>
     <div class="header">
         <h1>
-            <!-- สร้างfolder images ใน folder public <img class="logo" src="\images(ชื่อfolder)\footer(ชื่อsub-folder)\sedla.png(ชื่อไฟล์รูป)" alt="" /> -->
-            <i class="fas fa-leaf"></i><b> Carbon Footprint</b>
+            <img class="logo" src="\images\logo-med.png" />&nbsp;<b>Carbon Footprint</b>&nbsp;&nbsp;<i class="fas fa-leaf"></i>
         </h1>
     </div>
     <div class="sub-header">
@@ -248,6 +290,13 @@ $database = "cf";
             00,000.00
             <span class="carbon-unit">TonCO2-eq</span>
         </div>
+    </div>
+    <div class="monthpicker">
+        <!-- Month Picker Input -->
+        <input id="monthpicker" type="text" placeholder="Select Month and Year">
+        <span class="calendar-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </span>
     </div>
     <div class="bar-container">
         <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
@@ -323,9 +372,31 @@ $database = "cf";
             }
         });
 
+        // Month picker initialization
+        $("#monthpicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'MM yy',
+            onClose: function(dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+            }
+        });
 
-        const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-        const yValues = [55, 49, 44, 24, 15];
+        $("#monthpicker").focus(function() {
+            $(".ui-datepicker-calendar").hide();
+            $("#ui-datepicker-div").position({
+                my: "center top",
+                at: "center bottom",
+                of: $(this)
+            });
+        });
+
+        // Bar chart
+        const xValues = ["Solar Roofttop", "การเปลี่ยนหลอดไฟ LED", "การเปลี่ยนเชื้อเพลิงเตาเผา", "การตรวจวัดประสิทธิภาพ Chiller", "การทำแคมเปญ"];
+        const yValues = [55, 49, 44, 15, 10];
 
         // Function to adjust color lightness
         function adjustColor(color, amount) {
@@ -363,7 +434,10 @@ $database = "cf";
                     },
                     title: {
                         display: true,
-                        text: 'Carbon Footprint by Country'
+                        text: 'Carbon Footprint by Type',
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 },
                 scales: {
@@ -371,13 +445,20 @@ $database = "cf";
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Carbon Footprint (metric tons)'
+                            text: 'Carbon Footprint (metric tons)',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
+
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Country'
+                            text: 'Type',
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     }
                 }
@@ -390,5 +471,6 @@ $database = "cf";
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
     </footer>
 </body>
+
 
 </html>

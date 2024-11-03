@@ -50,9 +50,22 @@ $database = "cf";
         top: 0;
         background-color: #01696E;
         color: white;
-        padding: 8px;
-        text-align: left;
+        padding: 20px;
+        display: flex;
+        align-items: center;
     }
+
+    .header h1 {
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    .logo {
+        max-height: 40px;
+        margin-right: 10px;
+    }
+
 
     .sub-header {
         background-color: #20B2AA;
@@ -231,7 +244,7 @@ $database = "cf";
 <body>
     <div class="header">
         <h1>
-            <img class="logo" src="\images\logo-med.png" /> <b>Carbon Footprint </b> <i class="fas fa-leaf"></i>
+            <img class="logo" src="\images\logo-med.png" />&nbsp;<b>Carbon Footprint</b>&nbsp;&nbsp;<i class="fas fa-leaf"></i>
         </h1>
     </div>
     <div class="sub-header">

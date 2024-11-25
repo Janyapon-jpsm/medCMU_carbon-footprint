@@ -395,7 +395,7 @@ $database = "cf";
         });
 
         // Bar chart
-        const xValues = ["Solar Roofttop", "การเปลี่ยนหลอดไฟ LED", "การเปลี่ยนเชื้อเพลิงเตาเผา", "การตรวจวัดประสิทธิภาพ Chiller", "การทำแคมเปญ"];
+        const xValues = ["ระบบพลังงานแสงอาทิตย์บนหลังคา", "การเปลี่ยนหลอดไฟ LED", "การเปลี่ยนเชื้อเพลิงเตาเผา", "การตรวจวัดประสิทธิภาพ Chiller", "การทำแคมเปญ"];
         const yValues = [55, 49, 44, 15, 10];
 
         // Function to adjust color lightness

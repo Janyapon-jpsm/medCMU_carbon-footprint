@@ -55,9 +55,9 @@
 
 <body>
     <div class="header">
-        <i class='fas fa-arrow-left' style='font-size:36px'></i>
+        <i class='fas fa-arrow-left' style='font-size:36px' onclick="location.href='carbon-footprint-MedCMU-dashboard-em'"></i>
         <h1 style='text-align: center'>
-            <img class="logo" src="\images\logo-med.png" /> <b>Carbon Footprint </b> <i class="fas fa-leaf"></i>
+            <img class=" logo" src="\images\logo-med.png" /> <b>Carbon Footprint </b> <i class="fas fa-leaf"></i>
         </h1>
     </div>
 

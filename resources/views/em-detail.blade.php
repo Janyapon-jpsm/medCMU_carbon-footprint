@@ -64,16 +64,29 @@
             color: #01696E;
         }
 
+        .content div {
+            display: inline-block;
+            text-align: left;
+        }
+
         .chart-container {
+            display: inline-block;
+            vertical-align: top;
             background-color: white;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0px 20px 50px;
+            margin-right: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
+            width: 45%;
         }
 
+        .cf-details {
+            display: inline-block;
+            vertical-align: top;
+            color: #20B2AA;
+            padding: 20px;
+            width: 45%;
+        }
 
         .pics-container {
             text-align: center;
@@ -112,10 +125,19 @@
             <i class="fas fa-calendar-alt"></i>
         </span>
     </div>
-    <h2 class="title">CF จากการเผาไหม้เชื้อเพลิง</h2>
-    <div class="chart-container">
-        <canvas id="Chart1"></canvas>
+
+    <div class="content">
+        <h2 class="title">CF จากการเผาไหม้เชื้อเพลิง</h2>
+        <div class="flex-container">
+            <div class="chart-container">
+                <canvas id="Chart1"></canvas>
+            </div>
+            <div class="cf-details">
+                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+            </div>
+        </div>
     </div>
+
     <div class="pics-container">
         <img class="cfpics" src="\images\CF1-1.png" />
         <img class="cfpics" src="\images\CF1-2.png" />

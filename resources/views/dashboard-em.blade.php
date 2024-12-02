@@ -50,7 +50,7 @@ $database = "cf";
         top: 0;
         background-color: #01696E;
         color: white;
-        padding: 20px;
+        padding: 25px;
         display: flex;
         align-items: center;
     }
@@ -62,8 +62,8 @@ $database = "cf";
     }
 
     .logo {
-        max-height: 40px;
-        margin-right: 10px;
+        max-height: 50px;
+        margin-right: 20px;
     }
 
 
@@ -391,7 +391,7 @@ $database = "cf";
         });
 
         // Bar chart
-        const xValues = ["CF จากการเผาไหม้เชื้อเพลิง", "CF จากการรั่วไหลและอื่นๆ", "CF จากการใช้พลังงาน", "CF ทางอ้อมอื่นๆ"];
+        const xValues = ["Carbon Footprint จากการเผาไหม้เชื้อเพลิง", "Carbon Footprint จากการรั่วไหลและอื่นๆ", "Carbon Footprint จากการใช้พลังงาน", "Carbon Footprint ทางอ้อมอื่นๆ"];
         const yValues = [55, 49, 44, 15];
 
         // Function to adjust color lightness

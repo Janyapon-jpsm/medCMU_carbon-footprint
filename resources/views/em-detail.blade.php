@@ -40,6 +40,18 @@
             align-items: center;
         }
 
+        .back-icon {
+            background-color: #20B2AA;
+            border: #20B2AA;
+            padding: 7px;
+            color: #E5E5E5;
+        }
+
+        .back-icon:hover {
+            background-color: #01696E;
+            color: #f0f0f0;
+        }
+
         .logo {
             max-height: 40px;
         }
@@ -107,12 +119,56 @@
             color: #A9A9A9;
             text-align: center;
         }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .chart-container {
+            display: inline-block;
+            vertical-align: top;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 45%;
+            max-width: 550px;
+        }
+
+        .cf-details {
+            display: inline-block;
+            vertical-align: top;
+            color: #20B2AA;
+            padding: 10px;
+            width: 45%;
+            max-width: 600px;
+        }
+
+        .title {
+            text-align: left;
+            padding-left: 40px;
+            color: #01696E;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <i class='fas fa-arrow-left' style='font-size:36px' onclick="location.href='carbon-footprint-MedCMU-dashboard-em'"></i>&emsp;&emsp;
+        <button class="back-icon">
+            <i class='fas fa-arrow-left' style='font-size:36px' onclick="location.href='carbon-footprint-MedCMU-dashboard-em'"></i>
+        </button>
+        &emsp;&emsp;
         <h1>
             <img class=" logo" src="\images\logo-med.png" />&nbsp; <b>Carbon Footprint </b> &nbsp;&nbsp;<i class="fas fa-leaf"></i>
         </h1>
@@ -126,8 +182,8 @@
         </span>
     </div>
 
+    <h2 class="title">Carbon Footprint จากการเผาไหม้เชื้อเพลิง</h2>
     <div class="content">
-        <h2 class="title">CF จากการเผาไหม้เชื้อเพลิง</h2>
         <div class="flex-container">
             <div class="chart-container">
                 <canvas id="Chart1"></canvas>
@@ -144,21 +200,58 @@
         <img class="cfpics" src="\images\CF1-3.png" />
     </div>
 
-    <h2 class="title">CF จากการรั่วไหลและอื่นๆ</h2>
-    <div class="chart-container">
-        <canvas id="Chart2"></canvas>
+    <h2 class="title">Carbon Footprint จากการรั่วไหลและอื่นๆ</h2>
+    <div class="content">
+        <div class="flex-container">
+            <div class="chart-container">
+                <canvas id="Chart2"></canvas>
+            </div>
+            <div class="cf-details">
+                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+            </div>
+        </div>
     </div>
 
-    <h2 class="title">CF จากการใช้พลังงาน</h2>
-    <div class="chart-container">
-        <canvas id="Chart3"></canvas>
+    <div class="pics-container">
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
     </div>
 
-    <h2 class="title">CF ทางอ้อมอื่นๆ</h2>
-    <div class="chart-container">
-        <canvas id="Chart4"></canvas>
+    <h2 class="title">Carbon Footprint จากการใช้พลังงาน</h2>
+    <div class="content">
+        <div class="flex-container">
+            <div class="chart-container">
+                <canvas id="Chart3"></canvas>
+            </div>
+            <div class="cf-details">
+                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+            </div>
+        </div>
     </div>
 
+    <div class="pics-container">
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
+    </div>
+
+    <h2 class="title">Carbon Footprint ทางอ้อมอื่นๆ</h2>
+    <div class="content">
+        <div class="flex-container">
+            <div class="chart-container">
+                <canvas id="Chart4"></canvas>
+            </div>
+            <div class="cf-details">
+                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+            </div>
+        </div>
+    </div>
+    <div class="pics-container">
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
+        <img class="cfpics" src="" />
+    </div>
     <script>
         // Month picker initialization
         $("#monthpicker").datepicker({

@@ -164,8 +164,6 @@ $database = "cf";
         padding: 12px;
     }
 
-
-
     .show-carbon {
         margin: 40px auto;
         border: 2px solid #01696E;

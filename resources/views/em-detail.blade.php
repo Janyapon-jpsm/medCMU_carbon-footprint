@@ -213,9 +213,9 @@
     </div>
 
     <div class="pics-container">
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
+        <img class="cfpics" src="\images\CF2-1.jpg" />
+        <img class="cfpics" src="\images\CF2-2.jpeg" />
+        <img class="cfpics" src="\images\CF2-3.jpg" />
     </div>
 
     <h2 class="title">Carbon Footprint จากการใช้พลังงาน</h2>
@@ -231,9 +231,9 @@
     </div>
 
     <div class="pics-container">
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
+        <img class="cfpics" src="\images\CF3-1.jpg" />
+        <img class="cfpics" src="\images\CF3-2.png" />
+        <img class="cfpics" src="\images\CF3-3.jpg" />
     </div>
 
     <h2 class="title">Carbon Footprint ทางอ้อมอื่นๆ</h2>
@@ -248,9 +248,9 @@
         </div>
     </div>
     <div class="pics-container">
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
-        <img class="cfpics" src="" />
+        <img class="cfpics" src="\images\CF4-1.jpg" />
+        <img class="cfpics" src="\images\CF4-2.jpg" />
+        <img class="cfpics" src="\images\CF4-3.jpg" />
     </div>
     <script>
         // Month picker initialization

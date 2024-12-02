@@ -50,7 +50,7 @@ $database = "cf";
         top: 0;
         background-color: #01696E;
         color: white;
-        padding: 20px;
+        padding: 25px;
         display: flex;
         align-items: center;
     }
@@ -62,8 +62,8 @@ $database = "cf";
     }
 
     .logo {
-        max-height: 40px;
-        margin-right: 10px;
+        max-height: 50px;
+        margin-right: 20px;
     }
 
 
@@ -139,12 +139,6 @@ $database = "cf";
         border-radius: 25px;
         transition: 0.3s;
         cursor: pointer;
-    }
-
-    .button:active {
-        background-color: #20B2AA;
-        box-shadow: 0 5px #666;
-        transform: translateY(4px);
     }
 
     .button:active {

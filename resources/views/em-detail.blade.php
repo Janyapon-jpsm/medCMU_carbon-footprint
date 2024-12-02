@@ -64,11 +64,25 @@
 
         .monthpicker {
             text-align: left;
-            margin: 30px 0px 20px 50px;
+            margin: 30px 0px 80px 50px;
+            max-width: 100%;
         }
 
         .calendar-icon {
             color: #01696E;
+        }
+
+        .content-sec {
+            text-align: center;
+            margin: 0 auto;
+            width: 1410px;
+            padding: 10px;
+            margin: 30px;
+        }
+
+        .content-sec:hover {
+            background-color: #E5E5E5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .title {
@@ -102,12 +116,11 @@
 
         .pics-container {
             text-align: center;
-
         }
 
         .cfpics {
             max-height: 200px;
-            margin: 10px 40px;
+            margin: 10px 20px;
         }
 
         .footer {
@@ -182,76 +195,89 @@
         </span>
     </div>
 
-    <h2 class="title">Carbon Footprint จากการเผาไหม้เชื้อเพลิง</h2>
-    <div class="content">
-        <div class="flex-container">
-            <div class="chart-container">
-                <canvas id="Chart1"></canvas>
+    <div class="content-sec">
+        <h2 class="title">Carbon Footprint จากการเผาไหม้เชื้อเพลิง</h2>
+        <div class="content">
+            <div class="flex-container">
+                <div class="chart-container">
+                    <canvas id="Chart1"></canvas>
+                </div>
+                <div class="cf-details">
+                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+                </div>
             </div>
-            <div class="cf-details">
-                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
-            </div>
+        </div>
+
+        <div class="pics-container">
+            <img class="cfpics" src="\images\CF1-1.png" />
+            <img class="cfpics" src="\images\CF1-2.png" />
+            <img class="cfpics" src="\images\CF1-3.png" />
+            <img class="cfpics" src="\images\CF1-4.jpg" />
         </div>
     </div>
 
-    <div class="pics-container">
-        <img class="cfpics" src="\images\CF1-1.png" />
-        <img class="cfpics" src="\images\CF1-2.png" />
-        <img class="cfpics" src="\images\CF1-3.png" />
-    </div>
+    <div class="content-sec">
+        <h2 class="title">Carbon Footprint จากการรั่วไหลและอื่นๆ</h2>
+        <div class="content">
+            <div class="flex-container">
+                <div class="chart-container">
+                    <canvas id="Chart2"></canvas>
+                </div>
+                <div class="cf-details">
+                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+                </div>
+            </div>
+        </div>
 
-    <h2 class="title">Carbon Footprint จากการรั่วไหลและอื่นๆ</h2>
-    <div class="content">
-        <div class="flex-container">
-            <div class="chart-container">
-                <canvas id="Chart2"></canvas>
-            </div>
-            <div class="cf-details">
-                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
-            </div>
+        <div class="pics-container">
+            <img class="cfpics" src="\images\CF2-1.png" style="width: 300px; height: 500px;" />
+            <img class="cfpics" src="\images\CF2-2.jpg" />
+            <img class="cfpics" src="\images\CF2-3.jpg" />
+            <img class="cfpics" src="\images\CF2-4.jpg" />
         </div>
     </div>
 
-    <div class="pics-container">
-        <img class="cfpics" src="\images\CF2-1.jpg" />
-        <img class="cfpics" src="\images\CF2-2.jpeg" />
-        <img class="cfpics" src="\images\CF2-3.jpg" />
-    </div>
+    <div class="content-sec">
+        <h2 class="title">Carbon Footprint จากการใช้พลังงาน</h2>
+        <div class="content">
+            <div class="flex-container">
+                <div class="chart-container">
+                    <canvas id="Chart3"></canvas>
+                </div>
+                <div class="cf-details">
+                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+                </div>
+            </div>
+        </div>
 
-    <h2 class="title">Carbon Footprint จากการใช้พลังงาน</h2>
-    <div class="content">
-        <div class="flex-container">
-            <div class="chart-container">
-                <canvas id="Chart3"></canvas>
-            </div>
-            <div class="cf-details">
-                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
-            </div>
+        <div class="pics-container">
+            <img class="cfpics" src="\images\CF3-1.jpg" />
+            <img class="cfpics" src="\images\CF3-2.png" />
+            <img class="cfpics" src="\images\CF3-3.jpg" />
+            <img class="cfpics" src="\images\CF3-4.jpg" style="width: 300px; height: 500px;" />
         </div>
     </div>
 
-    <div class="pics-container">
-        <img class="cfpics" src="\images\CF3-1.jpg" />
-        <img class="cfpics" src="\images\CF3-2.png" />
-        <img class="cfpics" src="\images\CF3-3.jpg" />
-    </div>
-
-    <h2 class="title">Carbon Footprint ทางอ้อมอื่นๆ</h2>
-    <div class="content">
-        <div class="flex-container">
-            <div class="chart-container">
-                <canvas id="Chart4"></canvas>
-            </div>
-            <div class="cf-details">
-                <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+    <div class="content-sec">
+        <h2 class="title">Carbon Footprint ทางอ้อมอื่นๆ</h2>
+        <div class="content">
+            <div class="flex-container">
+                <div class="chart-container">
+                    <canvas id="Chart4"></canvas>
+                </div>
+                <div class="cf-details">
+                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
+                </div>
             </div>
         </div>
+        <div class="pics-container">
+            <img class="cfpics" src="\images\CF4-1.jpg" />
+            <img class="cfpics" src="\images\CF4-2.jpg" />
+            <img class="cfpics" src="\images\CF4-3.jpg" />
+            <img class="cfpics" src="\images\CF4-4.jpg" />
+        </div>
     </div>
-    <div class="pics-container">
-        <img class="cfpics" src="\images\CF4-1.jpg" />
-        <img class="cfpics" src="\images\CF4-2.jpg" />
-        <img class="cfpics" src="\images\CF4-3.jpg" />
-    </div>
+
     <script>
         // Month picker initialization
         $("#monthpicker").datepicker({

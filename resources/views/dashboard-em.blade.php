@@ -9,236 +9,238 @@ $database = "cf";
 <!DOCTYPE html>
 <html lang="en">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carbon Footprint - MedCMU</title>
-
-<!-- Load jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Then load jQuery UI -->
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-<!-- Then load Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-
-<!-- Other scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-
-<script src="monthpicker.js"></script>
-
-
-<link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
-
-<style>
-    body {
-        font-family: 'Kanit', Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f0f0f0;
-        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.6'%3E%3Ccircle cx='5' cy='5' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
-    }
-
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .header {
-        position: sticky;
-        top: 0;
-        background-color: #01696E;
-        color: white;
-        padding: 25px;
-        display: flex;
-        align-items: center;
-    }
-
-    .header h1 {
-        display: flex;
-        align-items: center;
-        margin: 0;
-    }
-
-    .logo {
-        max-height: 50px;
-        margin-right: 20px;
-    }
-
-
-    .sub-header {
-        background-color: #20B2AA;
-        color: white;
-        padding: 20px;
-        text-align: center;
-    }
-
-    .footer {
-        margin-top: 40px;
-        padding: 10px 0;
-        width: 100%;
-        position: relative;
-        background-color: #01696E;
-        color: #D5D5D5;
-        text-align: center;
-    }
-
-    .chart-container {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin: 20px auto;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 900px;
-        text-align: center;
-    }
-
-    .section-title {
-        text-align: center;
-        color: #2c7873;
-        margin-top: 40px;
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .progress-bar {
-        display: flex;
-        height: 30px;
-        background-color: #20B2AA;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        transition: width 0.5s ease-in-out;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    }
-
-    .button-container {
-        display: flex;
-        gap: 200px;
-        justify-content: center;
-        border: none;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        font-size: 18px;
-        margin: 4px 2px;
-
-    }
-
-    .button {
-        border: none;
-        border-radius: 25px;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-
-    .button:active {
-        background-color: #20B2AA;
-        box-shadow: 0 5px #666;
-        transform: translateY(4px);
-    }
-
-    .button-reduction:hover {
-        opacity: 1;
-        background-color: #2c7873;
-    }
-
-    .button-emission {
-        background-color: #D5D5D5;
-        color: black;
-        padding: 30px;
-    }
-
-    .button-reduction {
-        background-color: #20B2AA;
-        color: white;
-        padding: 12px;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint - MedCMU</title>
+    <link rel="icon" href="\images\leaf-solid.svg" type="image/png">
 
 
 
-    .show-carbon {
-        margin: 40px auto;
-        border: 2px solid #01696E;
-        border-radius: 100px;
-        padding: 20px;
-        max-width: 20%;
-        text-align: center;
+    <!-- Load jQuery first -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    }
+    <!-- Then load jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    .carbon-type {
-        text-align: center;
-        font-size: 18px;
-        color: #01696E;
-    }
+    <!-- Then load Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 
-    .carbon-value {
-        margin-top: 10px;
-        text-align: center;
-        font-size: 36px;
-        color: #20B2AA;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
+    <!-- Other scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 
-    .monthpicker {
-        text-align: center;
-        margin-bottom: 40px;
-    }
+    <script src="monthpicker.js"></script>
 
-    .calendar-icon {
-        color: #01696E;
-    }
 
-    .carbon-unit {
-        font-size: 18px;
-        color: #666;
-    }
+    <link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
 
-    .icon-container {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 30px;
-    }
+    <style>
+        body {
+            font-family: 'Kanit', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d3d3d3' fill-opacity='0.6'%3E%3Ccircle cx='5' cy='5' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+        }
 
-    .icon-item {
-        text-align: center;
-        margin-top: 20px;
-        color: #2c7873;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .icon-item i {
-        font-size: 48px;
-        margin-bottom: 10px;
-    }
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: #01696E;
+            color: white;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+        }
 
-    .section-title {
-        text-align: center;
-        color: #2c7873;
-        margin-top: 40px;
-        font-size: 24px;
-        font-weight: bold;
-    }
+        .header h1 {
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
 
-    .bar-container {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin: auto;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 1200px;
-        text-align: center;
-    }
-</style>
+        .logo {
+            max-height: 50px;
+            margin-right: 20px;
+        }
+
+
+        .sub-header {
+            background-color: #20B2AA;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 10px 0;
+            width: 100%;
+            position: relative;
+            background-color: #01696E;
+            color: #D5D5D5;
+            text-align: center;
+        }
+
+        .chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 900px;
+            text-align: center;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #2c7873;
+            margin-top: 40px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            display: flex;
+            height: 30px;
+            background-color: #20B2AA;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: width 0.5s ease-in-out;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 200px;
+            justify-content: center;
+            border: none;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 4px 2px;
+
+        }
+
+        .button {
+            border: none;
+            border-radius: 25px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .button:active {
+            background-color: #20B2AA;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        .button-reduction:hover {
+            opacity: 1;
+            background-color: #2c7873;
+        }
+
+        .button-emission {
+            background-color: #D5D5D5;
+            color: black;
+            padding: 30px;
+        }
+
+        .button-reduction {
+            background-color: #20B2AA;
+            color: white;
+            padding: 12px;
+        }
+
+        .show-carbon {
+            margin: 40px auto;
+            border: 2px solid #01696E;
+            border-radius: 100px;
+            padding: 20px;
+            max-width: 20%;
+            text-align: center;
+
+        }
+
+        .carbon-type {
+            text-align: center;
+            font-size: 18px;
+            color: #01696E;
+        }
+
+        .carbon-value {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 36px;
+            color: #20B2AA;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .monthpicker {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .calendar-icon {
+            color: #01696E;
+        }
+
+        .carbon-unit {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .icon-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .icon-item {
+            text-align: center;
+            margin-top: 20px;
+            color: #2c7873;
+        }
+
+        .icon-item i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #2c7873;
+            margin-top: 40px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .bar-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 1200px;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -295,7 +297,7 @@ $database = "cf";
         </span>
     </div>
     <div class="bar-container">
-        <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
+        <canvas onclick="location.href='carbon-footprint-emission-detail'" id="myChart" style="width:100%;max-width:1200px"></canvas>
     </div>
     <script>
         // Carbon Footprint Chart

@@ -38,12 +38,15 @@
             padding: 20px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         .back-icon {
+            font-size: 36px;
             background-color: #20B2AA;
             border: #20B2AA;
-            padding: 7px;
+            border-radius: 20px;
+            padding: 10px;
             color: #E5E5E5;
         }
 
@@ -60,11 +63,13 @@
             display: flex;
             align-items: center;
             margin: 0;
+            flex-grow: 1;
+            justify-content: center;
         }
 
         .monthpicker {
             text-align: left;
-            margin: 30px 0px 80px 50px;
+            margin: 30px 0px 50px 50px;
             max-width: 100%;
         }
 
@@ -74,15 +79,39 @@
 
         .content-sec {
             text-align: center;
-            margin: 0 auto;
-            width: 1410px;
+            width: 1390px;
             padding: 10px;
-            margin: 30px;
+            margin: 0 auto;
+            margin-bottom: 20px;
         }
 
         .content-sec:hover {
-            background-color: #E5E5E5;
+            background-color: whitesmoke;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 10px 0;
+            width: 100%;
+            position: relative;
+            background-color: #E5E5E5;
+            color: #A9A9A9;
+            text-align: center;
+        }
+
+        .edit-icon {
+            font-size: 15px;
+            background-color: #E5E5E5;
+            border: #E5E5E5;
+            border-radius: 20px;
+            padding: 10px;
+            color: #A9A9A9;
+        }
+
+        .edit-icon:hover {
+            background-color: #A9A9A9;
+            color: #f0f0f0;
         }
 
         .title {
@@ -102,7 +131,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-right: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.1);
             width: 45%;
         }
 
@@ -121,16 +150,6 @@
         .cfpics {
             max-height: 200px;
             margin: 10px 20px;
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding: 10px 0;
-            width: 100%;
-            position: relative;
-            background-color: #E5E5E5;
-            color: #A9A9A9;
-            text-align: center;
         }
 
         .content {
@@ -179,15 +198,15 @@
 <body>
     <div class="header">
         <button class="back-icon">
-            <i class='fas fa-arrow-left' style='font-size:36px' onclick="location.href='carbon-footprint-MedCMU-dashboard-em'"></i>
+            <i class="fas fa-arrow-left" onclick="location.href='carbon-footprint-MedCMU-dashboard-em'"></i>
         </button>
         &emsp;&emsp;
         <h1>
-            <img class=" logo" src="\images\logo-med.png" />&nbsp; <b>Carbon Footprint </b> &nbsp;&nbsp;<i class="fas fa-leaf"></i>
+            <img class=" logo" src="\images\logo-med.png" onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" />&nbsp; <b>Carbon Footprint </b> &nbsp;&nbsp;<i class="fas fa-leaf"></i>
         </h1>
     </div>
 
-    <div class="monthpicker">
+    <div class=" monthpicker">
         <!-- Month Picker Input -->
         <input id="monthpicker" type="text" placeholder="Select Month and Year">
         <span class="calendar-icon">
@@ -301,138 +320,103 @@
             });
         });
 
-        var xValues = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
-        var yValues = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25, 24, 19];
-        var barColors = ["red", "green", "blue", "orange", "brown"];
+        // Define data for all charts
+        const chart1Data = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25, 24, 19];
+        const chart2Data = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25];
+        const chart3Data = [55, 49, 44];
+        const chart4Data = [55, 49, 47, 44, 40, 38, 37, 35];
 
-        new Chart("Chart1", {
-            type: "horizontalBar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: "World Wine Production 2018"
-                },
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            min: 10,
-                            max: 60
-                        }
-                    }]
-                }
+        // Find the maximum value across all charts
+        const globalMaxValue = Math.max(
+            ...chart1Data,
+            ...chart2Data,
+            ...chart3Data,
+            ...chart4Data
+        );
+
+        function createChart(chartId, xValues, yValues, title) {
+            // Function to adjust color lightness
+            function adjustColor(color, amount) {
+                return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
             }
-        });
 
-        var xValues = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"];
-        var yValues = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25];
-        var barColors = ["red", "green", "blue", "orange", "brown"];
+            // Sort and get top 3
+            const indexedValues = yValues.map((value, index) => ({
+                value,
+                index
+            }));
+            indexedValues.sort((a, b) => b.value - a.value);
 
-        new Chart("Chart2", {
-            type: "horizontalBar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: "World Wine Production 2018"
-                },
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            min: 10,
-                            max: 60
-                        }
+            const baseColor = "#20B2AA";
+            const barColors = new Array(yValues.length).fill("#D3D3D3");
+
+            // Assign colors to top 3
+            barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
+            barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
+            barColors[indexedValues[2].index] = baseColor;
+
+            return new Chart(chartId, {
+                type: "horizontalBar",
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        backgroundColor: barColors,
+                        data: yValues
                     }]
+                },
+                options: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                min: 0,
+                                max: globalMaxValue // Use the global maximum value
+                            }
+                        }]
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        var xValues = ["A", "B", "C"];
-        var yValues = [55, 49, 44];
-        var barColors = ["red", "green", "blue"];
+        // Create charts with the same maximum value
+        createChart("Chart1",
+            ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"],
+            chart1Data,
+            "Carbon Footprint จากการเผาไหม้เชื้อเพลิง"
+        );
 
-        new Chart("Chart3", {
-            type: "horizontalBar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: "World Wine Production 2018"
-                },
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            min: 10,
-                            max: 60
-                        }
-                    }]
-                }
-            }
-        });
+        createChart("Chart2",
+            ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],
+            chart2Data,
+            "Carbon Footprint จากการรั่วไหลและอื่นๆ"
+        );
 
-        var xValues = ["A", "B", "C", "D", "E", "F", "G", "H"];
-        var yValues = [55, 49, 47, 44, 40, 38, 37, 35];
-        var barColors = ["red", "green", "blue", "orange", "brown"];
+        createChart("Chart3",
+            ["A", "B", "C"],
+            chart3Data,
+            "Carbon Footprint จากการใช้พลังงาน"
+        );
 
-        new Chart("Chart4", {
-            type: "horizontalBar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: "World Wine Production 2018"
-                },
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            min: 10,
-                            max: 60
-                        }
-                    }]
-                }
-            }
-        });
+        createChart("Chart4",
+            ["A", "B", "C", "D", "E", "F", "G", "H"],
+            chart4Data,
+            "Carbon Footprint ทางอ้อมอื่นๆ"
+        );
     </script>
 
     <footer class="footer">
         <p>© 2024 Janyapon Saingam. All rights reserved.</p>
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
+
+        <button class="edit-icon">
+            <i class="fas fa-pen" onclick="location.href='admin/login'"></i>
+        </button>
     </footer>
 </body>
 

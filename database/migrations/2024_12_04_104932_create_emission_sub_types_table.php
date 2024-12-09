@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carbon_footprints', function (Blueprint $table) {
+        Schema::create('emission_sub_types', function (Blueprint $table) {
             $table->id();
+            $table->string('sub_type');
+            $table->decimal('emission_factor', 10, 4);
+            $table->string('unit');
+            $table->foreignId('emission_type_id')->constrained('emission_types')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('carbon_footprints');
+        Schema::dropIfExists('emission_sub_types');
     }
 };

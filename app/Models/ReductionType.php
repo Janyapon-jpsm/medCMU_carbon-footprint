@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CarbonFootprint extends Model
+class ReductionType extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['type', 'detail'];
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Clusters\CarbonFootprint\Resources\EmissionTypeResource\Pages;
+namespace App\Filament\Resources\Pages;
 
-use App\Filament\Clusters\CarbonFootprint\Resources\EmissionTypeResource;
+use App\Filament\Resources\EmissionTypeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

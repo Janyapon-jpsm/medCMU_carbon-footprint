@@ -10,4 +10,9 @@ class ReductionType extends Model
     use HasFactory;
 
     protected $fillable = ['type', 'detail'];
+
+    public function reductionSubTypes()
+    {
+        return $this->hasMany(ReductionSubType::class, 'reduction_type_id');
+    }
 }

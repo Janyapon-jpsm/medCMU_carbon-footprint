@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReductionTypeResource\Pages;
 use App\Filament\Resources\ReductionTypeResource\RelationManagers;
+use App\Filament\Resources\ReductionTypeResource\RelationManagers\ReductionSubTypesRelationManager;
 use App\Models\ReductionType;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
@@ -62,7 +63,7 @@ class ReductionTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ReductionSubTypesRelationManager::class
         ];
     }
 

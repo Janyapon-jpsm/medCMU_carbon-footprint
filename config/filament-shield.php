@@ -13,20 +13,22 @@ return [
         'cluster' => null,
     ],
 
+    'tenant_model' => null,
+
     'auth_provider_model' => [
         'fqcn' => 'App\\Models\\User',
     ],
 
     'super_admin' => [
         'enabled' => true,
-        'name' => 'Admin',
+        'name' => 'super_admin',
         'define_via_gate' => false,
         'intercept_gate' => 'before', // after
     ],
 
     'panel_user' => [
         'enabled' => true,
-        'name' => 'Operator',
+        'name' => 'panel_user',
     ],
 
     'permission_prefixes' => [
@@ -43,6 +45,7 @@ return [
             'delete_any',
             'force_delete',
             'force_delete_any',
+            'lock'
         ],
 
         'page' => 'page',

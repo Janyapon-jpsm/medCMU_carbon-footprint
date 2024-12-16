@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reduction_sub_types', function (Blueprint $table) {
-            $table->id();
+            $table->id('re_sub_id');
             $table->string('sub_type');
             $table->decimal('emission_factor', 10, 4);
             $table->string('unit');
-            $table->foreignId('reduction_type_id')->constrained('reduction_types')->cascadeOnDelete();
             $table->timestamps();
         });
     }

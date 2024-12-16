@@ -9,10 +9,14 @@ class EmissionType extends Model
 {
     use HasFactory;
 
+    protected $table = 'emission_types';
+
+    protected $primaryKey = 'em_id';
+
     protected $fillable = ['type', 'detail'];
 
     public function emissionSubTypes()
     {
-        return $this->hasMany(EmissionSubType::class, 'emission_type_id');
+        return $this->hasMany(EmissionSubType::class, 'em_id', 'em_id');
     }
 }

@@ -12,6 +12,8 @@ use Filament\Models\Contracts\FilamentUser;
 
 class User extends Authenticatable
 {
+    protected $primaryKey = 'user_id';
+
     use HasFactory, Notifiable, HasRoles, HasPanelShield;
 
     /**

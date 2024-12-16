@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reduction_types', function (Blueprint $table) {
-            $table->id();
+            $table->id('re_id')->primary();
             $table->string('type');
             $table->text('detail')->nullable();
             $table->timestamps();

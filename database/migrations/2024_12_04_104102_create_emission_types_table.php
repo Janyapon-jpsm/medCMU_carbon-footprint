@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('emission_types', function (Blueprint $table) {
-            $table->id();
+            $table->id('em_id')->primary();
             $table->string('type');
             $table->text('detail')->nullable();
             $table->timestamps();

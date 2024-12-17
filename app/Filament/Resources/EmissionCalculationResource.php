@@ -17,7 +17,9 @@ class EmissionCalculationResource extends Resource
 {
     protected static ?string $model = EmissionCalculation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calculator';
+
+    protected static ?string $navigationGroup = 'Emissions';
 
     public static function form(Form $form): Form
     {

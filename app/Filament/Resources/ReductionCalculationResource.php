@@ -2,34 +2,28 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EmissionCalculationResource\Pages;
-use App\Filament\Resources\EmissionCalculationResource\RelationManagers;
-use App\Models\EmissionCalculation;
+use App\Filament\Resources\ReductionCalculationResource\Pages;
+use App\Filament\Resources\ReductionCalculationResource\RelationManagers;
+use App\Models\ReductionCalculation;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Filters\SelectFilter;
-use App\Models\EmissionType;
-use App\Models\EmissionSubType;
-use App\Models\User;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\TextColumn;
 
-use function Laravel\Prompts\text;
-
-class EmissionCalculationResource extends Resource
+class ReductionCalculationResource extends Resource
 {
-    protected static ?string $model = EmissionCalculation::class;
+    protected static ?string $model = ReductionCalculation::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calculator';
 
-    protected static ?string $navigationGroup = 'Emissions';
+    protected static ?string $navigationGroup = 'Reductions';
 
     public static function form(Form $form): Form
     {
@@ -40,15 +34,15 @@ class EmissionCalculationResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                Select::make('em_id')
-                    ->label('Emission Type')
-                    ->relationship('emissionType', 'type')
+                Select::make('re_id')
+                    ->label('Reduction Type')
+                    ->relationship('reductionType', 'type')
                     ->required()
                     ->searchable()
                     ->preload(),
-                Select::make('em_sub_id')
-                    ->label('Emission Sub Type')
-                    ->relationship('emissionSubType', 'sub_type')
+                Select::make('re_sub_id')
+                    ->label('Rudection Sub Type')
+                    ->relationship('reductionSubType', 'sub_type')
                     ->required()
                     ->searchable()
                     ->preload(),
@@ -56,13 +50,13 @@ class EmissionCalculationResource extends Resource
                     ->numeric()
                     ->required(),
                 TextInput::make('month')
-                    ->placeholder('Enter month as number (1-12)')
+                    ->placeholder('ใส่เลขเดือน (1-12)')
                     ->numeric()
                     ->required()
                     ->minValue(1)
                     ->maxValue(12),
                 TextInput::make('year')
-                    ->placeholder('e.g., 2024')
+                    ->placeholder('เช่น 2024')
                     ->numeric()
                     ->required()
                     ->minValue(1900)
@@ -79,12 +73,12 @@ class EmissionCalculationResource extends Resource
                     ->label('Name')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('emissionType.type')
-                    ->label('Emission Type')
+                TextColumn::make('reductionType.type')
+                    ->label('Reduction Type')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('emissionSubType.sub_type')
-                    ->label('Emission Sub Type')
+                TextColumn::make('reductionSubType.sub_type')
+                    ->label('Reduction Sub Type')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('amount')
@@ -118,15 +112,15 @@ class EmissionCalculationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('emission_type_id')
-                    ->label('Emission Type')
-                    ->relationship('emissionType', 'type')
+                SelectFilter::make('reduction_type_id')
+                    ->label('Reduction Type')
+                    ->relationship('reductionType', 'type')
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('emission_sub_type_id')
-                    ->label('Emission Sub Type')
-                    ->relationship('emissionSubType', 'sub_type')
+                SelectFilter::make('reduction_sub_type_id')
+                    ->label('Reduction Sub Type')
+                    ->relationship('reductionSubType', 'sub_type')
                     ->searchable()
                     ->preload(),
             ])
@@ -151,9 +145,9 @@ class EmissionCalculationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEmissionCalculations::route('/'),
-            'create' => Pages\CreateEmissionCalculation::route('/create'),
-            'edit' => Pages\EditEmissionCalculation::route('/{record}/edit'),
+            'index' => Pages\ListReductionCalculations::route('/'),
+            'create' => Pages\CreateReductionCalculation::route('/create'),
+            'edit' => Pages\EditReductionCalculation::route('/{record}/edit'),
         ];
     }
 }

@@ -23,7 +23,7 @@ class ReductionTypeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-asia-australia';
 
-    protected static ?string $navigationGroup = 'Reduction';
+    protected static ?string $navigationGroup = 'Reductions';
 
     public static function form(Form $form): Form
     {

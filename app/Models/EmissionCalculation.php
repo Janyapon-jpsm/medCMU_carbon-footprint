@@ -9,16 +9,31 @@ class EmissionCalculation extends Model
 {
     use HasFactory;
 
-    protected $table = 'emission_calculation';
+    protected $table = 'emission_calculations';
 
     protected $primaryKey = 'em_cal_id';
 
     protected $fillable = [
-        'em_sub_id',
         'user_id',
-        'unit',
+        'em_id',
+        'em_sub_id',
         'amount',
         'month',
         'year'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function emissionType()
+    {
+        return $this->belongsTo(EmissionType::class, 'em_id');
+    }
+
+    public function emissionSubType()
+    {
+        return $this->belongsTo(EmissionSubType::class, 'em_sub_id');
+    }
 }

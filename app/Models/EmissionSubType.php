@@ -19,4 +19,9 @@ class EmissionSubType extends Model
     {
         return $this->belongsTo(EmissionType::class, 'em_id', 'em_id');
     }
+
+    public function emissionCalculations()
+    {
+        return $this->hasMany(EmissionCalculation::class, 'em_sub_id');
+    }
 }

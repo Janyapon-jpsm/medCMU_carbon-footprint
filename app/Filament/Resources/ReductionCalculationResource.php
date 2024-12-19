@@ -41,7 +41,7 @@ class ReductionCalculationResource extends Resource
                     ->searchable()
                     ->preload(),
                 Select::make('re_sub_id')
-                    ->label('Rudection Sub Type')
+                    ->label('Reduction Sub Type')
                     ->relationship('reductionSubType', 'sub_type')
                     ->required()
                     ->searchable()

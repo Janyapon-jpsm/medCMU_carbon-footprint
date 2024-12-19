@@ -18,6 +18,9 @@ class ReductionCalculation extends Model
         'year'
     ];
 
+    protected $table = 'reduction_calculations';
+    protected $primaryKey = 're_cal_id';
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -26,5 +29,10 @@ class ReductionCalculation extends Model
     public function reductionType()
     {
         return $this->belongsTo(ReductionType::class, 're_id');
+    }
+
+    public function reductionSubType()
+    {
+        return $this->belongsTo(ReductionSubType::class, 're_sub_id');
     }
 }

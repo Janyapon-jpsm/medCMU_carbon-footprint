@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EmissionCalculationResource\Pages;
 use App\Models\EmissionCalculation;
 use App\Models\EmissionSubType;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Facades\Auth;
 
 class EmissionCalculationResource extends Resource
 {
@@ -28,11 +30,7 @@ class EmissionCalculationResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload(),
+                Hidden::make('user_id')->default(Auth::id()),
                 Select::make('em_sub_id')
                     ->label('Emission Sub Type')
                     ->relationship('emissionSubType', 'sub_type')
@@ -43,22 +41,40 @@ class EmissionCalculationResource extends Resource
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $emissionSubType = EmissionSubType::findOrFail($get('em_sub_id'));
                         $set('em_id', $emissionSubType->em_id);
+                        if ($emissionSubType->emissionType) {
+                            $set('em_type_name', $emissionSubType->emissionType->type); // Using 'type' column 
+                        } else {
+                            $set('em_type_name', 'Unknown');
+                        }
                     }),
-                Select::make('em_id')
-                    ->label('Emission Type')
-                    ->relationship('emissionType', 'type')
-                    ->searchable()
-                    ->preload()
+                Hidden::make('em_id')
                     ->required(),
+                TextInput::make('em_type_name')
+                    ->label('Emission Type')
+                    ->required()
+                    ->disabled(),
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),
-                TextInput::make('month')
-                    ->placeholder('Enter month as number (1-12)')
-                    ->numeric()
+                Select::make('month')
+                    ->label('Month')
                     ->required()
-                    ->minValue(1)
-                    ->maxValue(12),
+                    ->options([
+                        1 => 'Jan',
+                        2 => 'Feb',
+                        3 => 'Mar',
+                        4 => 'Apr',
+                        5 => 'May',
+                        6 => 'Jun',
+                        7 => 'Jul',
+                        8 => 'Aug',
+                        9 => 'Sept',
+                        10 => 'Oct',
+                        11 => 'Nov',
+                        12 => 'Dec',
+                    ])
+                    ->preload()
+                    ->searchable(),
                 TextInput::make('year')
                     ->placeholder('e.g., 2024')
                     ->numeric()

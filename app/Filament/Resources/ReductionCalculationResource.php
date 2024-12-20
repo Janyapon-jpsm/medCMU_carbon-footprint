@@ -57,12 +57,25 @@ class ReductionCalculationResource extends Resource
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),
-                TextInput::make('month')
-                    ->placeholder('ใส่เลขเดือน (1-12)')
-                    ->numeric()
+                Select::make('month')
+                    ->label('Month')
                     ->required()
-                    ->minValue(1)
-                    ->maxValue(12),
+                    ->options([
+                        1 => 'Jan',
+                        2 => 'Feb',
+                        3 => 'Mar',
+                        4 => 'Apr',
+                        5 => 'May',
+                        6 => 'Jun',
+                        7 => 'Jul',
+                        8 => 'Aug',
+                        9 => 'Sept',
+                        10 => 'Oct',
+                        11 => 'Nov',
+                        12 => 'Dec',
+                    ])
+                    ->preload()
+                    ->searchable(),
                 TextInput::make('year')
                     ->placeholder('เช่น 2024')
                     ->numeric()

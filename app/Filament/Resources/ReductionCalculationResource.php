@@ -3,19 +3,20 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReductionCalculationResource\Pages;
-use App\Filament\Resources\ReductionCalculationResource\RelationManagers;
 use App\Models\ReductionCalculation;
-use Filament\Forms;
+use App\Models\ReductionSubType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+use function Laravel\Prompts\textarea;
 
 class ReductionCalculationResource extends Resource
 {
@@ -34,18 +35,23 @@ class ReductionCalculationResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                Select::make('re_id')
-                    ->label('Reduction Type')
-                    ->relationship('reductionType', 'type')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
                 Select::make('re_sub_id')
                     ->label('Reduction Sub Type')
                     ->relationship('reductionSubType', 'sub_type')
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->live()
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $reductionSubType = ReductionSubType::findOrFail($get('re_sub_id'));
+                        $set('re_id', $reductionSubType->re_id);
+                    }),
+                Select::make('re_id')
+                    ->label('Reduction Type')
+                    ->relationship('reductionType', 'type')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),

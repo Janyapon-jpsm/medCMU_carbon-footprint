@@ -3,25 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmissionCalculationResource\Pages;
-use App\Filament\Resources\EmissionCalculationResource\RelationManagers;
 use App\Models\EmissionCalculation;
-use Filament\Forms;
+use App\Models\EmissionSubType;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
-use App\Models\EmissionType;
-use App\Models\EmissionSubType;
-use App\Models\User;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
-
-use function Laravel\Prompts\text;
 
 class EmissionCalculationResource extends Resource
 {
@@ -40,18 +33,23 @@ class EmissionCalculationResource extends Resource
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                Select::make('em_id')
-                    ->label('Emission Type')
-                    ->relationship('emissionType', 'type')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
                 Select::make('em_sub_id')
                     ->label('Emission Sub Type')
                     ->relationship('emissionSubType', 'sub_type')
                     ->required()
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->live()
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $emissionSubType = EmissionSubType::findOrFail($get('em_sub_id'));
+                        $set('em_id', $emissionSubType->em_id);
+                    }),
+                Select::make('em_id')
+                    ->label('Emission Type')
+                    ->relationship('emissionType', 'type')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),

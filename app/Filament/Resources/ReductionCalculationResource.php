@@ -16,7 +16,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-use function Laravel\Prompts\textarea;
 
 class ReductionCalculationResource extends Resource
 {
@@ -46,12 +45,10 @@ class ReductionCalculationResource extends Resource
                         $reductionSubType = ReductionSubType::findOrFail($get('re_sub_id'));
                         $set('re_id', $reductionSubType->re_id);
                     }),
-                Select::make('re_id')
+                TextInput::make('re_id')
                     ->label('Reduction Type')
-                    ->relationship('reductionType', 'type')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->required()
+                    ->readonly(),
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),

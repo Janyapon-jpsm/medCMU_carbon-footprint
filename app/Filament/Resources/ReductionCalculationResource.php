@@ -6,6 +6,7 @@ use App\Filament\Resources\ReductionCalculationResource\Pages;
 use App\Models\ReductionCalculation;
 use App\Models\ReductionSubType;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -15,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReductionCalculationResource extends Resource
@@ -29,11 +31,7 @@ class ReductionCalculationResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload(),
+                Hidden::make('user_id')->default(Auth::id()),
                 Select::make('re_sub_id')
                     ->label('Reduction Sub Type')
                     ->relationship('reductionSubType', 'sub_type')
@@ -44,11 +42,18 @@ class ReductionCalculationResource extends Resource
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $reductionSubType = ReductionSubType::findOrFail($get('re_sub_id'));
                         $set('re_id', $reductionSubType->re_id);
+                        if ($reductionSubType->reductionType) {
+                            $set('re_type_name', $reductionSubType->reductionType->type); // Using 'type' column 
+                        } else {
+                            $set('re_type_name', 'Unknown');
+                        }
                     }),
-                TextInput::make('re_id')
+                Hidden::make('re_id')
+                    ->required(),
+                TextInput::make('re_type_name')
                     ->label('Reduction Type')
                     ->required()
-                    ->readonly(),
+                    ->disabled(),
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),

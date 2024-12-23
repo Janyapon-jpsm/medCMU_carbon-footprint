@@ -40,12 +40,26 @@ class ReductionCalculationResource extends Resource
                     ->preload()
                     ->live()
                     ->afterStateUpdated(function (Get $get, Set $set) {
-                        $reductionSubType = ReductionSubType::findOrFail($get('re_sub_id'));
-                        $set('re_id', $reductionSubType->re_id);
-                        if ($reductionSubType->reductionType) {
-                            $set('re_type_name', $reductionSubType->reductionType->type);
+                        $reductionSubType = ReductionSubType::find($get('re_sub_id'));
+
+                        if ($reductionSubType) {
+                            // Set the reduction type ID
+                            $set('re_id', $reductionSubType->re_id);
+
+                            // Set the reduction type name
+                            if ($reductionSubType->reductionType) {
+                                $set('re_type_name', $reductionSubType->reductionType->type);
+                            } else {
+                                $set('re_type_name', 'Unknown');
+                            }
+
+                            // Set the emission factor
+                            $set('em_factor', $reductionSubType->emission_factor ?? 0);
                         } else {
+                            // Reset fields if no subtype is selected
+                            $set('re_id', null);
                             $set('re_type_name', 'Unknown');
+                            $set('em_factor', 0);
                         }
                     }),
                 Hidden::make('re_id')
@@ -53,7 +67,8 @@ class ReductionCalculationResource extends Resource
                 TextInput::make('re_type_name')
                     ->label('Reduction Type')
                     ->required()
-                    ->disabled(),
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->reductionType?->type ?? null),
                 Select::make('month')
                     ->label('Month')
                     ->required()
@@ -82,7 +97,29 @@ class ReductionCalculationResource extends Resource
                     ->default(now()->year),
                 TextInput::make('amount')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->reactive() // Ensures the field triggers updates when its value changes
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $amount = $get('amount') ?? 0;
+                        $emFactor = $get('em_factor') ?? 0;
+                        $set('total_cf', $amount * $emFactor); // Dynamically calculate total
+                    }),
+                TextInput::make('em_factor')
+                    ->label('Emission Factor')
+                    ->required()
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->reductionSubType?->emission_factor ?? null)
+                    ->reactive() // Ensures updates trigger recalculation
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $amount = $get('amount') ?? 0;
+                        $emFactor = $get('em_factor') ?? 0;
+                        $set('total_cf', $amount * $emFactor); // Dynamically calculate total
+                    }),
+                TextInput::make('total_cf')
+                    ->label('Carbon Footprint')
+                    ->suffix('kg CO2e')
+                    ->readOnly()
+                    ->formatStateUsing(fn($state) => number_format($state, 4)),
             ]);
     }
 
@@ -121,7 +158,10 @@ class ReductionCalculationResource extends Resource
                     ->sortable(),
                 TextColumn::make('amount')
                     ->numeric()
-                    //->formatStateUsing(fn($state) => number_format($state, 4))
+                    ->sortable(),
+                TextColumn::make('total_cf')
+                    ->label('Carbon Footprint (kg CO2e)')
+                    ->formatStateUsing(fn($state) => number_format($state, 4))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

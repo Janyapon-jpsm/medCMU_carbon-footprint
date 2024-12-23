@@ -117,7 +117,8 @@ class EmissionCalculationResource extends Resource
                 TextInput::make('total_cf')
                     ->label('Carbon Footprint')
                     ->suffix('kg CO2e')
-                    ->readOnly(),
+                    ->readOnly()
+                    ->formatStateUsing(fn($state) => number_format($state, 4)),
             ]);
     }
 

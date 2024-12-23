@@ -15,7 +15,8 @@ class ReductionCalculation extends Model
         're_sub_id',
         'amount',
         'month',
-        'year'
+        'year',
+        'total_cf'
     ];
 
     protected $table = 'reduction_calculations';

@@ -39,12 +39,26 @@ class EmissionCalculationResource extends Resource
                     ->preload()
                     ->live()
                     ->afterStateUpdated(function (Get $get, Set $set) {
-                        $emissionSubType = EmissionSubType::findOrFail($get('em_sub_id'));
-                        $set('em_id', $emissionSubType->em_id);
-                        if ($emissionSubType->emissionType) {
-                            $set('em_type_name', $emissionSubType->emissionType->type); // Using 'type' column 
+                        $emissionSubType = EmissionSubType::find($get('em_sub_id'));
+
+                        if ($emissionSubType) {
+                            // Set the emission type ID
+                            $set('em_id', $emissionSubType->em_id);
+
+                            // Set the emission type name
+                            if ($emissionSubType->emissionType) {
+                                $set('em_type_name', $emissionSubType->emissionType->type);
+                            } else {
+                                $set('em_type_name', 'Unknown');
+                            }
+
+                            // Set the emission factor
+                            $set('em_factor', $emissionSubType->emission_factor ?? 0);
                         } else {
+                            // Reset fields if no subtype is selected
+                            $set('em_id', null);
                             $set('em_type_name', 'Unknown');
+                            $set('em_factor', 0);
                         }
                     }),
                 Hidden::make('em_id')
@@ -52,10 +66,8 @@ class EmissionCalculationResource extends Resource
                 TextInput::make('em_type_name')
                     ->label('Emission Type')
                     ->required()
-                    ->disabled(),
-                TextInput::make('amount')
-                    ->numeric()
-                    ->required(),
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->emissionType?->type ?? null),
                 Select::make('month')
                     ->label('Month')
                     ->required()
@@ -76,12 +88,36 @@ class EmissionCalculationResource extends Resource
                     ->preload()
                     ->searchable(),
                 TextInput::make('year')
-                    ->placeholder('e.g., 2024')
+                    ->placeholder('เช่น 2024')
                     ->numeric()
                     ->required()
                     ->minValue(1900)
                     ->maxValue(2100)
                     ->default(now()->year),
+                TextInput::make('amount')
+                    ->numeric()
+                    ->required()
+                    ->reactive() // Ensures the field triggers updates when its value changes
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $amount = $get('amount') ?? 0;
+                        $emFactor = $get('em_factor') ?? 0;
+                        $set('total_cf', $amount * $emFactor); // Dynamically calculate total
+                    }),
+                TextInput::make('em_factor')
+                    ->label('Emission Factor')
+                    ->required()
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->emissionSubType?->emission_factor ?? null)
+                    ->reactive() // Ensures updates trigger recalculation
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        $amount = $get('amount') ?? 0;
+                        $emFactor = $get('em_factor') ?? 0;
+                        $set('total_cf', $amount * $emFactor); // Dynamically calculate total
+                    }),
+                TextInput::make('total_cf')
+                    ->label('Carbon Footprint')
+                    ->suffix('kg CO2e')
+                    ->readOnly(),
             ]);
     }
 
@@ -101,10 +137,6 @@ class EmissionCalculationResource extends Resource
                     ->label('Emission Sub Type')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('amount')
-                    ->numeric()
-                    ->formatStateUsing(fn($state) => number_format($state, 4))
-                    ->sortable(),
                 TextColumn::make('month')
                     ->formatStateUsing(fn($state) => [
                         1 => 'Jan',
@@ -121,6 +153,13 @@ class EmissionCalculationResource extends Resource
                         12 => 'Dec',
                     ][$state] ?? 'Unknown'),
                 TextColumn::make('year')
+                    ->sortable(),
+                TextColumn::make('amount')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('total_cf')
+                    ->label('Carbon Footprint (kg CO2e)')
+                    ->formatStateUsing(fn($state) => number_format($state, 4))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

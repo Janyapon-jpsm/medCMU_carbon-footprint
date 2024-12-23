@@ -43,7 +43,7 @@ class ReductionCalculationResource extends Resource
                         $reductionSubType = ReductionSubType::findOrFail($get('re_sub_id'));
                         $set('re_id', $reductionSubType->re_id);
                         if ($reductionSubType->reductionType) {
-                            $set('re_type_name', $reductionSubType->reductionType->type); // Using 'type' column 
+                            $set('re_type_name', $reductionSubType->reductionType->type);
                         } else {
                             $set('re_type_name', 'Unknown');
                         }
@@ -54,9 +54,6 @@ class ReductionCalculationResource extends Resource
                     ->label('Reduction Type')
                     ->required()
                     ->disabled(),
-                TextInput::make('amount')
-                    ->numeric()
-                    ->required(),
                 Select::make('month')
                     ->label('Month')
                     ->required()
@@ -83,6 +80,9 @@ class ReductionCalculationResource extends Resource
                     ->minValue(1900)
                     ->maxValue(2100)
                     ->default(now()->year),
+                TextInput::make('amount')
+                    ->numeric()
+                    ->required(),
             ]);
     }
 
@@ -102,10 +102,6 @@ class ReductionCalculationResource extends Resource
                     ->label('Reduction Sub Type')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('amount')
-                    ->numeric()
-                    ->formatStateUsing(fn($state) => number_format($state, 4))
-                    ->sortable(),
                 TextColumn::make('month')
                     ->formatStateUsing(fn($state) => [
                         1 => 'Jan',
@@ -122,6 +118,10 @@ class ReductionCalculationResource extends Resource
                         12 => 'Dec',
                     ][$state] ?? 'Unknown'),
                 TextColumn::make('year')
+                    ->sortable(),
+                TextColumn::make('amount')
+                    ->numeric()
+                    //->formatStateUsing(fn($state) => number_format($state, 4))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

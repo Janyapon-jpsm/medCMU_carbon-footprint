@@ -19,7 +19,8 @@ class EmissionCalculation extends Model
         'em_sub_id',
         'amount',
         'month',
-        'year'
+        'year',
+        'total_cf'
     ];
 
     public function user()

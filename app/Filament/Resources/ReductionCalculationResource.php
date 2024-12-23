@@ -119,7 +119,7 @@ class ReductionCalculationResource extends Resource
                     ->label('Carbon Footprint')
                     ->suffix('kg CO2e')
                     ->readOnly()
-                    ->formatStateUsing(fn($state) => number_format($state, 2)),
+                    ->formatStateUsing(fn($state) => number_format($state, 4)),
             ]);
     }
 

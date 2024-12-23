@@ -118,7 +118,7 @@ class EmissionCalculationResource extends Resource
                     ->label('Carbon Footprint')
                     ->suffix('kg CO2e')
                     ->readOnly()
-                    ->formatStateUsing(fn($state) => number_format($state, 4)),
+                    ->formatStateUsing(fn($state) => number_format($state, 2)),
             ]);
     }
 
@@ -126,18 +126,8 @@ class EmissionCalculationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')
-                    ->label('Name')
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('emissionType.type')
-                    ->label('Emission Type')
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('emissionSubType.sub_type')
-                    ->label('Emission Sub Type')
-                    ->sortable()
-                    ->searchable(),
+                TextColumn::make('year')
+                    ->sortable(),
                 TextColumn::make('month')
                     ->formatStateUsing(fn($state) => [
                         1 => 'Jan',
@@ -153,15 +143,23 @@ class EmissionCalculationResource extends Resource
                         11 => 'Nov',
                         12 => 'Dec',
                     ][$state] ?? 'Unknown'),
-                TextColumn::make('year')
-                    ->sortable(),
-                TextColumn::make('amount')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('emissionType.type')
+                    ->label('Emission Type')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('emissionSubType.sub_type')
+                    ->label('Emission Sub Type')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('total_cf')
-                    ->label('Carbon Footprint (kg CO2e)')
-                    ->formatStateUsing(fn($state) => number_format($state, 4))
-                    ->sortable(),
+                    ->label('Carbon Footprint')
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                    ->sortable()
+                    ->suffix(' kg CO2e'),
+                TextColumn::make('user.user_id')
+                    ->label('User ID')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -185,12 +183,15 @@ class EmissionCalculationResource extends Resource
                     ->preload(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('แก้ไข'),
+                Tables\Actions\DeleteAction::make()
+                    ->label('ลบ'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('ลบทั้งหมด'),
                 ]),
             ]);
     }

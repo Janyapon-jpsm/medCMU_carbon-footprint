@@ -53,14 +53,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('user_id')
                     ->sortable()
                     ->searchable()
-                    ->label('ชื่อ'),
-                Tables\Columns\TextColumn::make('email')
-                    ->sortable()
-                    ->searchable()
-                    ->label('อีเมล'),
+                    ->label('ไอดี'),
                 Tables\Columns\TextColumn::make('roles')
                     ->sortable()
                     ->searchable()
@@ -71,6 +67,15 @@ class UserResource extends Resource
                         }
                         return $record->roles->pluck('name')->implode(', ');
                     }),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable()
+                    ->label('ชื่อ'),
+                Tables\Columns\TextColumn::make('email')
+                    ->sortable()
+                    ->searchable()
+                    ->label('อีเมล'),
+
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('role')

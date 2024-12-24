@@ -97,7 +97,7 @@ class EmissionCalculationResource extends Resource
                 TextInput::make('amount')
                     ->numeric()
                     ->required()
-                    ->reactive() // Ensures the field triggers updates when its value changes
+                    ->reactive()
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $amount = $get('amount') ?? 0;
                         $emFactor = $get('em_factor') ?? 0;
@@ -108,7 +108,7 @@ class EmissionCalculationResource extends Resource
                     ->required()
                     ->readOnly()
                     ->formatStateUsing(fn($state, $record) => $record?->emissionSubType?->emission_factor ?? null)
-                    ->reactive() // Ensures updates trigger recalculation
+                    ->reactive() // updates trigger recalculation
                     ->afterStateUpdated(function (Get $get, Set $set) {
                         $amount = $get('amount') ?? 0;
                         $emFactor = $get('em_factor') ?? 0;
@@ -117,8 +117,9 @@ class EmissionCalculationResource extends Resource
                 TextInput::make('total_cf')
                     ->label('Carbon Footprint')
                     ->suffix('kg CO2e')
+                    ->required()
                     ->readOnly()
-                    ->formatStateUsing(fn($state) => number_format($state, 4)),
+                    ->formatStateUsing(fn($state, $record) => ($record?->amount ?? 0) * ($record?->emissionSubType?->emission_factor ?? 0))
             ]);
     }
 

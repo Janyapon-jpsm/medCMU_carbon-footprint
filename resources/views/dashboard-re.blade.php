@@ -1,7 +1,4 @@
 <?php
-$username = "root";
-$password = "";
-$database = "cf";
 
 
 ?>
@@ -26,11 +23,6 @@ $database = "cf";
 
 <!-- Other scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-
-<script src="monthpicker.js"></script>
-
-
-<link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
 
 <style>
     body {
@@ -189,15 +181,6 @@ $database = "cf";
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .monthpicker {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .calendar-icon {
-        color: #01696E;
-    }
-
     .carbon-unit {
         font-size: 18px;
         color: #666;
@@ -206,18 +189,118 @@ $database = "cf";
     .icon-container {
         display: flex;
         justify-content: space-around;
-        margin-top: 30px;
+        margin: 40px auto;
+        max-width: 900px;
+        gap: 30px;
+        padding: 20px;
     }
 
     .icon-item {
+        flex: 1;
+        background: white;
+        padding: 30px 20px;
+        border-radius: 15px;
         text-align: center;
-        margin-top: 20px;
-        color: #2c7873;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+    }
+
+    .icon-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 25px rgba(32, 178, 170, 0.2);
+    }
+
+    .icon-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #01696E, #20B2AA);
     }
 
     .icon-item i {
-        font-size: 48px;
-        margin-bottom: 10px;
+        font-size: 40px;
+        color: #20B2AA;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .icon-item:hover i {
+        transform: scale(1.2);
+        color: #01696E;
+    }
+
+    .icon-item p {
+        margin: 15px 0 0 0;
+        color: #2c7873;
+        font-size: 18px;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .icon-item::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 3px;
+        background: #20B2AA;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .icon-item:hover::after {
+        opacity: 1;
+        width: 60%;
+    }
+
+    /* Add circular background effect for icons */
+    .icon-item i::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        background: rgba(32, 178, 170, 0.1);
+        border-radius: 50%;
+        z-index: -1;
+        transition: all 0.3s ease;
+    }
+
+    .icon-item:hover i::before {
+        width: 80px;
+        height: 80px;
+        background: rgba(32, 178, 170, 0.15);
+    }
+
+    /* Add subtle wave animation */
+    @keyframes wave {
+        0% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-5px);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    .icon-item:hover i {
+        animation: wave 2s infinite ease-in-out;
     }
 
     .section-title {
@@ -236,6 +319,49 @@ $database = "cf";
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         width: 1200px;
         text-align: center;
+    }
+
+    .monthpicker-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 2rem auto;
+        position: relative;
+        max-width: 300px;
+    }
+
+    #monthpicker {
+        width: 100%;
+        padding: 1rem 3rem;
+        border: 2px solid #20B2AA;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        text-align: center;
+        outline: none;
+        background-color: white;
+        color: #2c3e50;
+        cursor: pointer;
+        font-family: 'Kanit', Arial, sans-serif;
+    }
+
+    .calendar-icon {
+        position: absolute;
+        left: 1rem;
+        color: #20B2AA;
+        font-size: 1.2rem;
+        pointer-events: none;
+    }
+
+    /* Basic datepicker styling */
+    .ui-datepicker {
+        padding: 1rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .ui-datepicker-calendar {
+        display: none;
     }
 </style>
 </head>
@@ -286,12 +412,11 @@ $database = "cf";
             <span class="carbon-unit">TonCO2-eq</span>
         </div>
     </div>
-    <div class="monthpicker">
-        <!-- Month Picker Input -->
-        <input id="monthpicker" type="text" placeholder="Select Month and Year">
+    <div class="monthpicker-container">
         <span class="calendar-icon">
             <i class="fas fa-calendar-alt"></i>
         </span>
+        <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
     </div>
     <div class="bar-container">
         <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
@@ -368,24 +493,18 @@ $database = "cf";
         });
 
         // Month picker initialization
-        $("#monthpicker").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            showButtonPanel: true,
-            dateFormat: 'MM yy',
-            onClose: function(dateText, inst) {
-                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
-            }
-        });
-
-        $("#monthpicker").focus(function() {
-            $(".ui-datepicker-calendar").hide();
-            $("#ui-datepicker-div").position({
-                my: "center top",
-                at: "center bottom",
-                of: $(this)
+        $(document).ready(function() {
+            $("#monthpicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'MM yy',
+                yearRange: "2020:2030",
+                onClose: function(dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+                }
             });
         });
 

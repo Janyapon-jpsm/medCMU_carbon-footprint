@@ -164,7 +164,7 @@
             border: 2px solid #01696E;
             border-radius: 100px;
             padding: 20px;
-            max-width: 20%;
+            max-width: 25%;
             text-align: center;
 
         }
@@ -398,12 +398,12 @@
             </div>
         </div>
         <div class="button-container">
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน ()</button>
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน ()</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (Emission)</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (Reduction)</button>
         </div>
     </div>
     <div class="show-carbon">
-        <div class="carbon-type">การปล่อยคาร์บอน ()</div>
+        <div class="carbon-type">การปล่อยคาร์บอน (Carbon Emission)</div>
         <div class="carbon-value">
             00,000.00
             <span class="carbon-unit">Ton-eq</span>
@@ -427,14 +427,14 @@
             data: {
                 labels: ['2565', '2566'], //connect database
                 datasets: [{
-                    label: 'การปล่อยคาร์บอน ()',
+                    label: 'การปล่อยคาร์บอน (Emission)',
                     data: [50, 45, ], //connect database
                     borderColor: '#ff6b6b',
                     backgroundColor: 'rgba(255, 107, 107, 0.2)',
                     fill: true,
                     tension: 0.4
                 }, {
-                    label: 'การลดการปล่อยคาร์บอน ()',
+                    label: 'การลดการปล่อยคาร์บอน (Reduction)',
                     data: [25, 20, ], //connect database
                     borderColor: '#4ecdc4',
                     backgroundColor: 'rgba(78, 205, 196, 0.2)',

@@ -1,5 +1,89 @@
 <?php
-//
+// Set the content type to JSON
+header('Content-Type: application/json');
+
+// Database credentials
+$host = 'mysql';
+$username = 'root';
+$password = 'rootpassword';
+$database = 'cf';
+
+try {
+    // Create a PDO connection
+    $dsn = "mysql:host=$host;dbname=$database;charset=utf8mb4";
+    $pdo = new PDO($dsn, $username, $password);
+
+    // Set PDO options
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Handle connection errors
+    echo json_encode(["success" => false, "error" => "Connection failed: " . $e->getMessage()]);
+    exit;
+}
+
+// Input parameters for month and year
+$selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+$selectedYear = isset($_GET['year']) ? intval($_GET['year']) : null;
+
+// Query for the line chart: Carbon Footprint over time
+$lineChartData = [
+    'emissions' => [],
+    'reductions' => []
+];
+
+try {
+    // Query for emissions
+    $queryEmissions = "
+        SELECT year, SUM(amount) AS total_cf
+        FROM emission_calculations
+        GROUP BY year
+        ORDER BY year ASC
+    ";
+    $stmtEmissions = $pdo->query($queryEmissions);
+    $lineChartData['emissions'] = $stmtEmissions->fetchAll();
+
+    // Query for reductions
+    $queryReductions = "
+        SELECT year, SUM(amount) AS total_cf
+        FROM reduction_calculations
+        GROUP BY year
+        ORDER BY year ASC
+    ";
+    $stmtReductions = $pdo->query($queryReductions);
+    $lineChartData['reductions'] = $stmtReductions->fetchAll();
+} catch (PDOException $e) {
+    echo json_encode(["success" => false, "error" => "Error fetching line chart data: " . $e->getMessage()]);
+    exit;
+}
+
+// Query for the bar chart: Carbon Footprint for selected month and year
+$barChartData = [];
+if ($selectedMonth !== null && $selectedYear !== null) {
+    try {
+        $queryBarChart = "
+            SELECT em_type, SUM(amount) AS total_cf
+            FROM emission_calculations
+            WHERE month = :month AND year = :year
+            GROUP BY em_type
+        ";
+        $stmtBarChart = $pdo->prepare($queryBarChart);
+        $stmtBarChart->execute(['month' => $selectedMonth, 'year' => $selectedYear]);
+        $barChartData = $stmtBarChart->fetchAll();
+    } catch (PDOException $e) {
+        echo json_encode(["success" => false, "error" => "Error fetching bar chart data: " . $e->getMessage()]);
+        exit;
+    }
+}
+
+// Combine response data
+$response = [
+    'success' => true,
+    'lineChart' => $lineChartData,
+    'barChart' => $barChartData
+];
+
+echo json_encode($response);
 ?>
 
 <!DOCTYPE html>
@@ -25,6 +109,8 @@
     <!-- Then load jQuery UI -->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
@@ -420,148 +506,150 @@
     </div>
 
     <script>
-        // Carbon Footprint Chart
-        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
-        new Chart(carbonCtx, {
-            type: 'line',
-            data: {
-                labels: ['2565', '2566'], //connect database
-                datasets: [{
-                    label: 'การปล่อยคาร์บอน (Emission)',
-                    data: [50, 45, ], //connect database
-                    borderColor: '#ff6b6b',
-                    backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'การลดการปล่อยคาร์บอน (Reduction)',
-                    data: [25, 20, ], //connect database
-                    borderColor: '#4ecdc4',
-                    backgroundColor: 'rgba(78, 205, 196, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Carbon Footprint Over Time'
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Contexts for Line and Bar Charts
+            const carbonCtx = document.getElementById('carbonChart').getContext('2d');
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            let carbonChart = null;
+            let barChart = null;
+
+            // Fetch chart data and update charts
+            function fetchChartData(selectedMonth = null, selectedYear = null) {
+                const url = selectedMonth && selectedYear ?
+                    `fetch_combined_chart_data.php?month=${selectedMonth}&year=${selectedYear}` :
+                    'fetch_combined_chart_data.php';
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            console.error('Error in response:', data.error);
+                            return;
+                        }
+
+                        // Line Chart Data
+                        const years = data.lineChart.emissions.map(item => item.year);
+                        const emissions = data.lineChart.emissions.map(item => item.total_cf);
+                        const reductions = data.lineChart.reductions.map(item => item.total_cf);
+
+                        // Update or Create Line Chart
+                        if (carbonChart) {
+                            carbonChart.data.labels = years;
+                            carbonChart.data.datasets[0].data = emissions;
+                            carbonChart.data.datasets[1].data = reductions;
+                            carbonChart.update();
+                        } else {
+                            carbonChart = new Chart(carbonCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: years,
+                                    datasets: [{
+                                            label: 'Carbon Emissions (CO2)',
+                                            data: emissions,
+                                            borderColor: '#ff6b6b',
+                                            backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                                            fill: true,
+                                            tension: 0.4
+                                        },
+                                        {
+                                            label: 'Carbon Reductions (CO2)',
+                                            data: reductions,
+                                            borderColor: '#4ecdc4',
+                                            backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                                            fill: true,
+                                            tension: 0.4
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: {
+                                            display: true,
+                                            position: 'top'
+                                        },
+                                        tooltip: {
+                                            mode: 'index',
+                                            intersect: false
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Year'
+                                            }
+                                        },
+                                        y: {
+                                            title: {
+                                                display: true,
+                                                text: 'Total (CO2)'
+                                            },
+                                            beginAtZero: true
+                                        }
+                                    }
                                 }
-                                label += context.raw;
-                                return label + ' metric tons';
-                            }
+                            });
                         }
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year',
-                            font: {
-                                weight: 'bold'
-                            }
+
+                        // Bar Chart Data
+                        const labels = data.barChart.map(item => item.em_type);
+                        const values = data.barChart.map(item => item.total_cf);
+
+                        // Update or Create Bar Chart
+                        if (barChart) {
+                            barChart.data.labels = labels;
+                            barChart.data.datasets[0].data = values;
+                            barChart.update();
+                        } else {
+                            barChart = new Chart(barCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Carbon Footprint',
+                                        data: values,
+                                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: {
+                                            display: true,
+                                            position: 'top'
+                                        },
+                                        tooltip: {
+                                            mode: 'index',
+                                            intersect: false
+                                        }
+                                    },
+                                    scales: {
+                                        x: {
+                                            title: {
+                                                display: true,
+                                                text: 'Emission Type'
+                                            }
+                                        },
+                                        y: {
+                                            title: {
+                                                display: true,
+                                                text: 'Total (CO2)'
+                                            },
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Carbon Emissions (Ton-eq)',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        beginAtZero: true,
-                    }
-                }
+                    })
+                    .catch(error => console.error('Error fetching chart data:', error));
             }
-        });
 
-        // Bar chart
-        const xValues = ["Carbon Footprint จากการเผาไหม้เชื้อเพลิง", "Carbon Footprint จากการรั่วไหลและอื่นๆ", "Carbon Footprint จากการใช้พลังงาน", "Carbon Footprint ทางอ้อมอื่นๆ"];
-        const yValues = [55, 49, 44, 15];
+            // Fetch data on page load
+            fetchChartData();
 
-        // Function to adjust color lightness
-        function adjustColor(color, amount) {
-            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
-        }
-
-        // Sort yValues to determine top 3
-        const indexedValues = yValues.map((value, index) => ({
-            value,
-            index
-        }));
-        indexedValues.sort((a, b) => b.value - a.value);
-
-        const baseColor = "#20B2AA";
-        const barColors = new Array(yValues.length).fill("#D3D3D3");
-
-        // Assign colors to top 3
-        barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
-        barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
-        barColors[indexedValues[2].index] = baseColor;
-
-        new Chart("myChart", {
-            type: "bar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Carbon Footprint by Type',
-                        font: {
-                            weight: 'bold'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Carbon Footprint (metric tons)',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Type',
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        $(document).ready(function() {
+            // Month-Year Picker Initialization for Bar Chart
             $("#monthpicker").datepicker({
                 changeMonth: true,
                 changeYear: true,
@@ -569,9 +657,12 @@
                 dateFormat: 'MM yy',
                 yearRange: "2020:2030",
                 onClose: function(dateText, inst) {
-                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    const month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    const year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
                     $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+
+                    // Fetch data for the selected month and year
+                    fetchChartData(parseInt(month) + 1, parseInt(year));
                 }
             });
         });

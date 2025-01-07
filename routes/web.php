@@ -14,6 +14,6 @@ Route::get('/carbon-footprint-MedCMU-dashboard-re', function () {
     return view('dashboard-re');
 });
 
-Route::get('/carbon-footprint-emission-detail', function () {
+Route::get('/emission-detail', function () {
     return view('em-detail');
 });

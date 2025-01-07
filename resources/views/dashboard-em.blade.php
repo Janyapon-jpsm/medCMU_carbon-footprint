@@ -7,7 +7,7 @@ $database = "cf";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
-    echo "Connected successfully!";
+    echo "";
 } catch (PDOException $e) {
     die("ERROR: Could not connect. " . $e->getMessage());
 }
@@ -180,7 +180,7 @@ try {
 
         .carbon-type {
             text-align: center;
-            font-size: 18px;
+            font-size: 15px;
             color: #01696E;
         }
 
@@ -190,6 +190,12 @@ try {
             font-size: 36px;
             color: #20B2AA;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .carbon-unit {
+            text-align: center;
+            font-size: 20px;
+            color: #01696E;
         }
 
         .icon-container {
@@ -305,6 +311,54 @@ try {
             }
         }
 
+        .progress-container {
+            width: 100%;
+            background-color: #f4f4f4;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+        }
+
+        .progress-bar-fill {
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 14px;
+            border-right: 2px solid white;
+        }
+
+        .progress-bar-reduction {
+            background-color: #4ecdc4;
+        }
+
+        .progress-bar-emission {
+            background-color: #ff6b6b;
+            border-right: none;
+            /* Last bar has no border */
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #2c7873;
+        }
+
+        .label {
+            width: 50%;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .label:first-child {
+            text-align: left;
+        }
+
+        .label:last-child {
+            text-align: right;
+        }
+
         .icon-item:hover i {
             animation: wave 2s infinite ease-in-out;
         }
@@ -386,13 +440,45 @@ try {
     <div class="chart-container">
         <canvas id="carbonChart"></canvas>
     </div>
+
+    <!-- show progress bar -->
     <div class="container">
         <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
-        <div class="progress-bar">
-            <!-- connect width % to the database -->
-            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% การลดการปล่อยคาร์บอน</div>
-            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% การปล่อยคาร์บอน</div>
+        <!-- labels -->
+        <div class="progress-labels">
+            <div class="label">การลดการปล่อยก๊าซเรือนกระจก</div>
+            <div class="label">การปล่อยก๊าซเรือนกระจก</div>
         </div>
+
+        <div class="progress-container">
+            <?php
+            // Fetch and calculate the percentages for emissions and reductions
+            $sqlEmissions = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
+            $stmtEmissions = $pdo->prepare($sqlEmissions);
+            $stmtEmissions->execute();
+            $totalEmissions = $stmtEmissions->fetchColumn(); // Total emissions
+
+            $sqlReductions = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations"; // Assuming you have a table for reductions
+            $stmtReductions = $pdo->prepare($sqlReductions);
+            $stmtReductions->execute();
+            $totalReductions = $stmtReductions->fetchColumn(); // Total reductions
+
+            $total = $totalEmissions + $totalReductions; // Total value
+            $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0; // Calculate emission percentage
+            $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0; // Calculate reduction percentage
+            ?>
+
+            <!-- Reduction Bar -->
+            <div class="progress-bar-fill progress-bar-reduction" style="width: <?php echo number_format($reductionPercentage, 2); ?>%;">
+                <?php echo number_format($reductionPercentage); ?>%
+            </div>
+
+            <!-- Emission Bar -->
+            <div class="progress-bar-fill progress-bar-emission" style="width: <?php echo number_format($emissionPercentage, 2); ?>%;">
+                <?php echo number_format($emissionPercentage); ?>%
+            </div>
+        </div>
+
         <div class="icon-container">
             <div class="icon-item">
                 <i class="fas fa-tree"></i>
@@ -408,17 +494,26 @@ try {
             </div>
         </div>
         <div class="button-container">
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยคาร์บอน (Emission)</button>
-            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (Reduction)</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-em'" class="button button-emission">การปล่อยก๊าซเรือนกระจก (Emission)</button>
+            <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยก๊าซเรือนกระจก (Reduction)</button>
         </div>
     </div>
+    <!-- show overall carbon emission -->
     <div class="show-carbon">
-        <div class="carbon-type">การปล่อยคาร์บอน (Carbon Emission)</div>
+        <div class="carbon-type">รวมการปล่อยก๊าซเรือนกระจกทั้งหมดในคณะแพทยศาสตร์</div>
         <div class="carbon-value">
-            00,000.00
-            <span class="carbon-unit">Ton-eq</span>
+            <?php
+            // Query to get the total carbon emissions
+            $sql = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $totalEmission = $stmt->fetchColumn(); // Fetch the total emission value
+            ?>
+            <?php echo number_format($totalEmission, 2); ?> <!-- Display the total emission -->
         </div>
+        <span class="carbon-unit">kg CO2e</span>
     </div>
+    <!-- month picker -->
     <div class="monthpicker-container">
         <span class="calendar-icon">
             <i class="fas fa-calendar-alt"></i>
@@ -428,21 +523,45 @@ try {
 
     <!-- bar chart -->
     <?php
-    // Attempt select query execution
+    // Initialize the variable
+    $totalCF = []; // Ensure this is defined before use
+    $carbonType = []; // Initialize this as well
+
+    // Get month and year from POST request
+    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because month is 0-indexed
+    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null; // Default to current year
+
     try {
-        $sql = "SELECT ec.*, et.type
-                FROM emission_calculations ec
-                JOIN emission_types et ON ec.em_id = et.em_id";
+        if ($selectedMonth && $selectedYear) {
+            // Query for specific month and year
+            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint
+                    FROM emission_calculations ec
+                    JOIN emission_types et ON ec.em_id = et.em_id
+                    WHERE MONTH(ec.date_column) = :month AND YEAR(ec.date_column) = :year
+                    GROUP BY et.type";
 
-        $result = $pdo->query($sql);
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+            $stmt->bindParam(':year', $selectedYear, PDO::PARAM_INT);
+        } else {
+            // Query for overall data if no date is selected
+            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint
+                    FROM emission_calculations ec
+                    JOIN emission_types et ON ec.em_id = et.em_id
+                    GROUP BY et.type";
 
-        if ($result->rowCount() > 0) {
+            $stmt = $pdo->prepare($sql);
+        }
+
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
             $totalCF = [];
             $carbonType = [];
 
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $totalCF[] = $row["total_cf"]; // Assuming this is the correct column name
-                $carbonType[] = $row["type"]; // Get the type name from the emission_types table
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $totalCF[] = $row["total_carbon_footprint"];
+                $carbonType[] = $row["type"];
             }
         } else {
             echo "No records matching your query were found.";
@@ -455,28 +574,28 @@ try {
     unset($pdo);
     ?>
     <div class="bar-container">
-        <canvas id="barChart"></canvas>
+        <canvas id="barChart" onclick="location.href='emission-detail'"></canvas>
     </div>
-    <!--onclick="location.href='carbon-footprint-emission-detail'" -->
+
 
 
     <script>
-        /*  // Carbon Footprint Chart
-        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
+        // Carbon Footprint Chart setup 
+        /* const carbonCtx = document.getElementById('carbonChart').getContext('2d');
         new Chart(carbonCtx, {
             type: 'line',
             data: {
-                labels: ['2565', '2566'], //connect database
+                labels: ['2022', '2023', '2024'], //connect database
                 datasets: [{
                     label: 'การปล่อยคาร์บอน (Emission)',
-                    data: [50, 45, ], //connect database
+                    data: [50, 45, 50], //connect database
                     borderColor: '#ff6b6b',
                     backgroundColor: 'rgba(255, 107, 107, 0.2)',
                     fill: true,
                     tension: 0.4
                 }, {
                     label: 'การลดการปล่อยคาร์บอน (Reduction)',
-                    data: [25, 20, ], //connect database
+                    data: [25, 20, 24], //connect database
                     borderColor: '#4ecdc4',
                     backgroundColor: 'rgba(78, 205, 196, 0.2)',
                     fill: true,
@@ -520,7 +639,7 @@ try {
                     y: {
                         title: {
                             display: true,
-                            text: 'Carbon Emissions (TonCO2-eq)',
+                            text: 'Carbon Emissions (kg CO2e)',
                             font: {
                                 weight: 'bold'
                             }
@@ -529,7 +648,7 @@ try {
                     }
                 }
             }
-        });
+        }); */
 
         // Month picker initialization
         $(document).ready(function() {
@@ -538,14 +657,36 @@ try {
                 changeYear: true,
                 showButtonPanel: true,
                 dateFormat: 'MM yy',
-                yearRange: "2020:2030",
                 onClose: function(dateText, inst) {
                     var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
                     var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
                     $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
+
+                    // Call a function to fetch data based on the selected month and year
+                    fetchData(month, year);
                 }
             });
-        }); */
+        });
+
+        // Function to fetch data based on selected month and year
+        function fetchData(month, year) {
+            $.ajax({
+                url: 'path/to/your/php/script.php', // Update with the correct path to your PHP script
+                type: 'POST',
+                data: {
+                    month: month,
+                    year: year
+                },
+                success: function(response) {
+                    // Assuming response is JSON containing totalCF and carbonType
+                    const data = JSON.parse(response);
+                    updateChart(data.totalCF, data.carbonType); // Call function to update the chart
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
 
         // Bar chart setup
         const barColors = 'rgba(54, 162, 235, 0.6)'; // Define bar color
@@ -584,7 +725,7 @@ try {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Carbon Footprint (metric tons)',
+                            text: 'Carbon Footprint (kg CO2e)',
                             font: {
                                 weight: 'bold'
                             }
@@ -593,7 +734,7 @@ try {
                     x: {
                         title: {
                             display: true,
-                            text: 'Type',
+                            text: 'Emission Type',
                             font: {
                                 weight: 'bold'
                             }

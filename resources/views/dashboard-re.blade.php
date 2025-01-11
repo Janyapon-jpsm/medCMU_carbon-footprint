@@ -1,5 +1,16 @@
 <?php
 
+$host = "mysql";
+$username = "root";
+$password = "rootpassword";
+$database = "cf";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
+    echo "";
+} catch (PDOException $e) {
+    die("ERROR: Could not connect. " . $e->getMessage());
+}
 
 ?>
 
@@ -169,7 +180,7 @@
 
     .carbon-type {
         text-align: center;
-        font-size: 18px;
+        font-size: 15px;
         color: #01696E;
     }
 
@@ -182,8 +193,8 @@
     }
 
     .carbon-unit {
-        font-size: 18px;
-        color: #666;
+        font-size: 20px;
+        color: #01696E;
     }
 
     .icon-container {
@@ -303,6 +314,54 @@
         animation: wave 2s infinite ease-in-out;
     }
 
+    .progress-container {
+        width: 100%;
+        background-color: #f4f4f4;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+    }
+
+    .progress-bar-fill {
+        color: white;
+        text-align: center;
+        padding: 5px 0;
+        font-size: 14px;
+        border-right: 2px solid white;
+    }
+
+    .progress-bar-reduction {
+        background-color: #4ecdc4;
+    }
+
+    .progress-bar-emission {
+        background-color: #ff6b6b;
+        border-right: none;
+        /* Last bar has no border */
+    }
+
+    .progress-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        color: #2c7873;
+    }
+
+    .label {
+        width: 50%;
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+    .label:first-child {
+        text-align: left;
+    }
+
+    .label:last-child {
+        text-align: right;
+    }
+
     .section-title {
         text-align: center;
         color: #2c7873;
@@ -317,7 +376,7 @@
         padding: 20px;
         margin: auto;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 1200px;
+        width: 1250px;
         text-align: center;
     }
 
@@ -381,11 +440,41 @@
     </div>
     <div class="container">
         <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
-        <div class="progress-bar">
-            <!-- connect width % to the database -->
-            <div class="progress-bar-fill" style="width: 35%; background-color: #4ecdc4;">35% การลดการปล่อยคาร์บอน</div>
-            <div class="progress-bar-fill" style="width: 65%; background-color: #ff6b6b;">65% การปล่อยคาร์บอน</div>
+        <!-- labels -->
+        <div class="progress-labels">
+            <div class="label">การลดการปล่อยคาร์บอน</div>
+            <div class="label">การปล่อยคาร์บอน</div>
         </div>
+
+        <div class="progress-container">
+            <?php
+            // Fetch and calculate the percentages for emissions and reductions
+            $sqlEmissions = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
+            $stmtEmissions = $pdo->prepare($sqlEmissions);
+            $stmtEmissions->execute();
+            $totalEmissions = $stmtEmissions->fetchColumn(); // Total emissions
+
+            $sqlReductions = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations"; // Assuming you have a table for reductions
+            $stmtReductions = $pdo->prepare($sqlReductions);
+            $stmtReductions->execute();
+            $totalReductions = $stmtReductions->fetchColumn(); // Total reductions
+
+            $total = $totalEmissions + $totalReductions; // Total value
+            $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0; // Calculate emission percentage
+            $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0; // Calculate reduction percentage
+            ?>
+
+            <!-- Reduction Bar -->
+            <div class="progress-bar-fill progress-bar-reduction" style="width: <?php echo number_format($reductionPercentage, 2); ?>%;">
+                <?php echo number_format($reductionPercentage); ?>%
+            </div>
+
+            <!-- Emission Bar -->
+            <div class="progress-bar-fill progress-bar-emission" style="width: <?php echo number_format($emissionPercentage, 2); ?>%;">
+                <?php echo number_format($emissionPercentage); ?>%
+            </div>
+        </div>
+
         <div class="icon-container">
             <div class="icon-item">
                 <i class="fas fa-tree"></i>
@@ -405,22 +494,88 @@
             <button onclick="location.href='carbon-footprint-MedCMU-dashboard-re'" class="button button-reduction">การลดการปล่อยคาร์บอน (Reduction)</button>
         </div>
     </div>
+
+
+    <!-- show overall carbon reduction -->
     <div class="show-carbon">
-        <div class="carbon-type">การลดการปล่อยคาร์บอน (Carbon Reduction)</div>
+        <div class="carbon-type">รวมการลดการปล่อยคาร์บอนทั้งหมดในคณะแพทยศาสตร์</div>
         <div class="carbon-value">
-            00,000.00
-            <span class="carbon-unit">TonCO2-eq</span>
+            <?php
+            // Query to get the total carbon reduction
+            $sql = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $totalReduction = $stmt->fetchColumn(); // Fetch the total reduction value
+            ?>
+            <?php echo number_format($totalReduction, 2); ?> <!-- Display the total reduction -->
         </div>
+        <span class="carbon-unit">kg CO2e</span>
     </div>
+
+    <!-- month picker -->
     <div class="monthpicker-container">
         <span class="calendar-icon">
             <i class="fas fa-calendar-alt"></i>
         </span>
         <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
     </div>
+
+    <!-- bar chart -->
+    <?php
+    // Initialize the variable
+    $totalCF = []; // Ensure this is defined before use
+    $carbonType = []; // Initialize this as well
+
+    // Get month and year from POST request
+    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because month is 0-indexed
+    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null; // Default to current year
+
+    try {
+        if ($selectedMonth && $selectedYear) {
+            // Query for specific month and year
+            $sql = "SELECT rt.type, SUM(rc.total_cf) AS total_carbon_footprint
+                    FROM reduction_calculations rc
+                    JOIN reduction_types et ON rc.re_id = rt.re_id
+                    WHERE MONTH(rc.month) = :month AND YEAR(rc.year) = :year
+                    GROUP BY rt.type";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+            $stmt->bindParam(':year', $selectedYear, PDO::PARAM_INT);
+        } else {
+            // Query for overall data if no date is selected
+            $sql = "SELECT rt.type, SUM(rc.total_cf) AS total_carbon_footprint
+                    FROM reduction_calculations rc
+                    JOIN reduction_types rt ON rc.re_id = rt.re_id
+                    GROUP BY rt.type";
+
+            $stmt = $pdo->prepare($sql);
+        }
+
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $totalCF = [];
+            $carbonType = [];
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $totalCF[] = $row["total_carbon_footprint"];
+                $carbonType[] = $row["type"];
+            }
+        } else {
+            echo "No records matching your query were found.";
+        }
+    } catch (PDOException $e) {
+        die("ERROR: Could not execute $sql. " . $e->getMessage());
+    }
+
+    // Close connection
+    unset($pdo);
+    ?>
     <div class="bar-container">
-        <canvas id="myChart" style="width:100%;max-width:1200px"></canvas>
+        <canvas id="barChart" style="width:100%;max-width:1200px"></canvas>
     </div>
+
     <script>
         // Carbon Footprint Chart
         const carbonCtx = document.getElementById('carbonChart').getContext('2d');
@@ -508,43 +663,48 @@
             });
         });
 
-        // Bar chart
-        const xValues = ["ระบบพลังงานแสงอาทิตย์บนหลังคา", "การเปลี่ยนหลอดไฟ LED", "การเปลี่ยนเชื้อเพลิงเตาเผา", "การตรวจวัดประสิทธิภาพ Chiller", "การทำแคมเปญ"];
-        const yValues = [55, 49, 44, 15, 10];
+        // Bar chart setup
+        const ctx = document.getElementById('barChart').getContext('2d');
 
-        // Function to adjust color lightness
-        function adjustColor(color, amount) {
-            return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
-        }
+        // Setup Block
+        const totalCF = <?php echo json_encode($totalCF); ?>;
+        const carbonType = <?php echo json_encode($carbonType); ?>;
 
-        // Sort yValues to determine top 3
-        const indexedValues = yValues.map((value, index) => ({
-            value,
-            index
+        // Combine and sort data
+        const combinedData = carbonType.map((type, index) => ({
+            type: type,
+            value: totalCF[index]
         }));
-        indexedValues.sort((a, b) => b.value - a.value);
 
-        const baseColor = "#20B2AA";
-        const barColors = new Array(yValues.length).fill("#D3D3D3");
+        // Sort combined data by value in descending order
+        combinedData.sort((a, b) => b.value - a.value);
 
-        // Assign colors to top 3
-        barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
-        barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
-        barColors[indexedValues[2].index] = baseColor;
+        // Extract sorted labels and data
+        const sortedCarbonType = combinedData.map(item => item.type);
+        const sortedTotalCF = combinedData.map(item => item.value);
 
-        new Chart("myChart", {
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400); // Adjust the height as needed
+        gradient.addColorStop(0, '#2c7873'); // Color for the biggest bar
+        gradient.addColorStop(1, '#20B2AA'); // Color for the smallest bar
+
+        const data = {
+            labels: sortedCarbonType,
+            datasets: [{
+                label: 'Carbon Footprint', // Add a label for the dataset
+                backgroundColor: gradient, // Use the gradient for the bars
+                data: sortedTotalCF
+            }]
+        };
+
+        // Config Block
+        const config = {
             type: "bar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    backgroundColor: barColors,
-                    data: yValues
-                }]
-            },
+            data,
             options: {
                 plugins: {
                     legend: {
-                        display: false
+                        display: true // Set to true to display the legend
                     },
                     title: {
                         display: true,
@@ -559,25 +719,46 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Carbon Footprint (metric tons)',
+                            text: 'Carbon Footprint (kg CO2e)',
                             font: {
                                 weight: 'bold'
                             }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Format numbers with commas
+                            },
+                            font: {
+                                size: 12 // Adjust font size for better readability
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)', // Light grid color for better visibility
+                            lineWidth: 1 // Adjust grid line width
                         }
-
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Type',
+                            text: 'Reduction Type',
                             font: {
                                 weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 12 // Adjust font size for better readability
                             }
                         }
                     }
                 }
             }
-        });
+        };
+        // Render Block
+        const barChart = new Chart(
+            document.getElementById('barChart'),
+            config
+        );
     </script>
 
     <footer class="footer">

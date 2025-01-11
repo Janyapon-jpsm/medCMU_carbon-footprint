@@ -41,6 +41,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .back-icon {
@@ -69,14 +71,52 @@
             justify-content: center;
         }
 
-        .monthpicker {
-            text-align: left;
-            margin: 30px 0px 50px 50px;
-            max-width: 100%;
+        .monthpicker-container {
+            display: flex;
+            justify-content: flex-start;
+            /* Change from center to flex-start */
+            align-items: center;
+            margin: 2rem;
+            /* Change from margin: 2rem auto to just 2rem */
+            position: relative;
+            max-width: 300px;
+            /* If you want it further from the left edge */
+            margin-left: 3rem;
+            /* Add some space from the left edge */
+        }
+
+        #monthpicker {
+            width: 100%;
+            padding: 1rem 3rem;
+            border: 2px solid #20B2AA;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            background-color: white;
+            color: #2c3e50;
+            cursor: pointer;
+            font-family: 'Kanit', Arial, sans-serif;
         }
 
         .calendar-icon {
-            color: #01696E;
+            position: absolute;
+            left: 1rem;
+            color: #20B2AA;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        /* Basic datepicker styling */
+        .ui-datepicker {
+            padding: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .ui-datepicker-calendar {
+            display: none;
         }
 
         .content-sec {
@@ -127,23 +167,14 @@
         }
 
         .chart-container {
-            display: inline-block;
-            vertical-align: top;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-right: 20px;
-            box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.1);
-            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            max-width: 1000px;
+            width: 170%;
         }
 
-        .cf-details {
-            display: inline-block;
-            vertical-align: top;
-            color: #20B2AA;
-            padding: 20px;
-            width: 45%;
-        }
 
         .pics-container {
             text-align: center;
@@ -168,26 +199,6 @@
             margin: 0 auto;
         }
 
-        .chart-container {
-            display: inline-block;
-            vertical-align: top;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 45%;
-            max-width: 550px;
-        }
-
-        .cf-details {
-            display: inline-block;
-            vertical-align: top;
-            color: #20B2AA;
-            padding: 10px;
-            width: 45%;
-            max-width: 600px;
-        }
-
         .title {
             text-align: left;
             padding-left: 40px;
@@ -208,12 +219,12 @@
         </h1>
     </div>
 
-    <div class=" monthpicker">
-        <!-- Month Picker Input -->
-        <input id="monthpicker" type="text" placeholder="Select Month and Year">
+    <!-- month picker -->
+    <div class="monthpicker-container">
         <span class="calendar-icon">
             <i class="fas fa-calendar-alt"></i>
         </span>
+        <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
     </div>
 
     <div class="content-sec">
@@ -222,9 +233,6 @@
             <div class="flex-container">
                 <div class="chart-container">
                     <canvas id="Chart1"></canvas>
-                </div>
-                <div class="cf-details">
-                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
                 </div>
             </div>
         </div>
@@ -244,9 +252,6 @@
                 <div class="chart-container">
                     <canvas id="Chart2"></canvas>
                 </div>
-                <div class="cf-details">
-                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
-                </div>
             </div>
         </div>
 
@@ -265,9 +270,6 @@
                 <div class="chart-container">
                     <canvas id="Chart3"></canvas>
                 </div>
-                <div class="cf-details">
-                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
-                </div>
             </div>
         </div>
 
@@ -285,9 +287,6 @@
             <div class="flex-container">
                 <div class="chart-container">
                     <canvas id="Chart4"></canvas>
-                </div>
-                <div class="cf-details">
-                    <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Dui tempus vulputate himenaeos facilisis vel. Rhoncus enim mus primis aenean eleifend. Quis porttitor penatibus ridiculus elit tincidunt natoque. Tincidunt aliquam velit augue tortor vulputate ante. Platea mauris nec odio convallis accumsan ultricies finibus netus. Vehicula rutrum dictum iaculis ac pretium auctor platea. Facilisi semper est cursus diam convallis est donec. Nisi tellus malesuada sed blandit; eros nibh augue nisl. Aptent aptent sodales aenean inceptos iaculis; volutpat proin sociosqu.</p>
                 </div>
             </div>
         </div>
@@ -322,94 +321,77 @@
             });
         });
 
-        // Define data for all charts
-        const chart1Data = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25, 24, 19];
-        const chart2Data = [55, 49, 47, 44, 40, 38, 37, 35, 30, 28, 25];
-        const chart3Data = [55, 49, 44];
-        const chart4Data = [55, 49, 47, 44, 40, 38, 37, 35];
+        // Sample data for the four charts
+        const chart1Data = [55, 49, 47, 44, 40];
+        const chart2Data = [60, 50, 45, 40, 35];
+        const chart3Data = [70, 65, 60, 55, 50];
+        const chart4Data = [80, 75, 70, 65, 60];
 
-        // Find the maximum value across all charts
-        const globalMaxValue = Math.max(
-            ...chart1Data,
-            ...chart2Data,
-            ...chart3Data,
-            ...chart4Data
-        );
+        // Function to create a horizontal bar chart
+        function createHorizontalBarChart(chartId, labels, data, title) {
+            const ctx = document.getElementById(chartId).getContext('2d');
 
-        function createChart(chartId, xValues, yValues, title) {
-            // Function to adjust color lightness
-            function adjustColor(color, amount) {
-                return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
-            }
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '#2c7873');
+            gradient.addColorStop(1, '#20B2AA');
 
-            // Sort and get top 3
-            const indexedValues = yValues.map((value, index) => ({
-                value,
-                index
-            }));
-            indexedValues.sort((a, b) => b.value - a.value);
+            const chartData = {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    backgroundColor: gradient,
+                    data: data
+                }]
+            };
 
-            const baseColor = "#20B2AA";
-            const barColors = new Array(yValues.length).fill("#D3D3D3");
-
-            // Assign colors to top 3
-            barColors[indexedValues[0].index] = adjustColor(baseColor, -40);
-            barColors[indexedValues[1].index] = adjustColor(baseColor, -20);
-            barColors[indexedValues[2].index] = baseColor;
-
-            return new Chart(chartId, {
-                type: "horizontalBar",
-                data: {
-                    labels: xValues,
-                    datasets: [{
-                        backgroundColor: barColors,
-                        data: yValues
-                    }]
-                },
+            const config = {
+                type: 'horizontalBar',
+                data: chartData,
                 options: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: title
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: title,
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
                     },
                     scales: {
-                        xAxes: [{
-                            ticks: {
-                                min: 0,
-                                max: globalMaxValue // Use the global maximum value
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value',
+                                font: {
+                                    weight: 'bold'
+                                }
                             }
-                        }]
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Categories',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
                     }
                 }
-            });
+            };
+
+            new Chart(ctx, config);
         }
 
-        // Create charts with the same maximum value
-        createChart("Chart1",
-            ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"],
-            chart1Data,
-            "Carbon Footprint จากการเผาไหม้เชื้อเพลิง"
-        );
-
-        createChart("Chart2",
-            ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],
-            chart2Data,
-            "Carbon Footprint จากการรั่วไหลและอื่นๆ"
-        );
-
-        createChart("Chart3",
-            ["A", "B", "C"],
-            chart3Data,
-            "Carbon Footprint จากการใช้พลังงาน"
-        );
-
-        createChart("Chart4",
-            ["A", "B", "C", "D", "E", "F", "G", "H"],
-            chart4Data,
-            "Carbon Footprint ทางอ้อมอื่นๆ"
-        );
+        // Create the charts
+        createHorizontalBarChart('Chart1', ['A', 'B', 'C', 'D', 'E'], chart1Data, 'Chart 1 Title');
+        createHorizontalBarChart('Chart2', ['A', 'B', 'C', 'D', 'E'], chart2Data, 'Chart 2 Title');
+        createHorizontalBarChart('Chart3', ['A', 'B', 'C', 'D', 'E'], chart3Data, 'Chart 3 Title');
+        createHorizontalBarChart('Chart4', ['A', 'B', 'C', 'D', 'E'], chart4Data, 'Chart 4 Title');
     </script>
 
     <footer class="footer">

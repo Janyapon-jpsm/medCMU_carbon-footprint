@@ -463,10 +463,51 @@ try {
 
     <!-- line chart -->
     <?php
+    // Fetch data for emissions by year
+    $sqlEmissions = "SELECT year, 
+                             SUM(total_cf) AS total_emission
+                      FROM emission_calculations
+                      GROUP BY year
+                      ORDER BY YEAR";
 
+    $stmtEmissions = $pdo->prepare($sqlEmissions);
+    $stmtEmissions->execute();
+
+    $years = [];
+    $emissions = [];
+    $reductions = []; // Initialize reductions array
+
+    while ($row = $stmtEmissions->fetch(PDO::FETCH_ASSOC)) {
+        $years[] = $row['year']; // This will be the year
+        $emissions[] = $row['total_emission'];
+        $reductions[] = 0; // Initialize reductions to 0 for each year
+    }
+
+    // Fetch data for reductions by year
+    $sqlReductions = "SELECT year, 
+                             SUM(total_cf) AS total_reduction
+                      FROM reduction_calculations
+                      GROUP BY year
+                      ORDER BY year";
+    $stmtReductions = $pdo->prepare($sqlReductions);
+    $stmtReductions->execute();
+
+    while ($row = $stmtReductions->fetch(PDO::FETCH_ASSOC)) {
+        // Ensure that the year exists in the years array
+        $index = array_search($row['year'], $years);
+        if ($index !== false) {
+            // If it exists, add the reduction to the corresponding year
+            $reductions[$index] += $row['total_reduction'];
+        } else {
+            // If it doesn't exist, add a new entry
+            $years[] = $row['year'];
+            $emissions[] = 0; // No emissions for this year
+            $reductions[] = $row['total_reduction'];
+        }
+    }
     ?>
     <div class="chart-container">
-        <canvas id="carbonChart"></canvas>
+        <canvas id="lineChart"></canvas>
     </div>
 
 
@@ -642,42 +683,100 @@ try {
 
 
     <script>
-        // Carbon Footprint Chart setup
-        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
+        // Line chart setup
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
 
-        // Sample data for the line chart (replace with actual data later)
-        const carbonYears = ['2565', '2566', '2567']; // Example years
-        const totalEmissionCF = [50, 45, 43]; // Example emission data
-        const totalReductionCF = [25, 20, 23]; // Example reduction data
+        // Setup Block
+        const years = <?php echo json_encode($years); ?>; // Use years for x-axis labels
+        const emissions = <?php echo json_encode($emissions); ?>;
+        const reductions = <?php echo json_encode($reductions); ?>;
 
-        // Combine data for the datasets
-        const lineChartData = {
-            labels: carbonYears,
-            datasets: [{
-                label: 'การปล่อยคาร์บอน (Emission)',
-                data: totalEmissionCF,
-                borderColor: '#ff6b6b',
-                backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                fill: true,
-                tension: 0.4
-            }, {
-                label: 'การลดการปล่อยคาร์บอน (Reduction)',
-                data: totalReductionCF,
-                borderColor: '#4ecdc4',
-                backgroundColor: 'rgba(78, 205, 196, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
+        // Create datasets
+        const datasets = [{
+                label: 'Emissions',
+                data: emissions,
+                borderColor: 'rgba(255, 99, 132, 1)', // Line color for emissions
+                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Optional background for fill
+                borderWidth: 2, // Line thickness
+                fill: false // No fill under the line
+            },
+            {
+                label: 'Reductions',
+                data: reductions,
+                borderColor: 'rgba(54, 162, 235, 1)', // Line color for reductions
+                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Optional background for fill
+                borderWidth: 2, // Line thickness
+                fill: false // No fill under the line
+            }
+        ];
+
+        const lineData = {
+            labels: years, // X-axis labels
+            datasets: datasets // Add datasets for emissions and reductions
         };
 
-        // Config Block for Line Chart
-        const lineChartConfig = {
+        // Config Block
+        const LineConfig = {
             type: 'line',
-            data: lineChartData,
+            data: lineData, // Use lineData for the data source
+            options: {
+                plugins: {
+                    legend: {
+                        display: true, // Display the legend
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Annual Emissions and Reductions',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                responsive: true, // Make the chart responsive
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 12 // Adjust font size for better readability
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true, // Start Y-axis at zero
+                        title: {
+                            display: true,
+                            text: 'Values',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 12 // Adjust font size for better readability
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)', // Light grid color for better visibility
+                            lineWidth: 1 // Adjust grid line width
+                        }
+                    }
+                }
+            }
         };
 
         // Render Block
-        const carbonChart = new Chart(carbonCtx, lineChartConfig);
+        const lineChart = new Chart(
+            lineCtx,
+            LineConfig // Use LineConfig for the chart
+        );
 
         // Month picker initialization
         $(document).ready(function() {
@@ -718,43 +817,43 @@ try {
         }
 
         // Bar chart setup
-        const ctx = document.getElementById('barChart').getContext('2d');
+        const barCtx = document.getElementById('barChart').getContext('2d');
 
-        // Setup Block
-        const totalCF = <?php echo json_encode($totalCF); ?>;
-        const carbonType = <?php echo json_encode($carbonType); ?>;
+        // Assuming you have similar data fetching logic for the bar chart
+        const totalCF = <?php echo json_encode($totalCF); ?>; // Ensure this is defined
+        const carbonType = <?php echo json_encode($carbonType); ?>; // Ensure this is defined
 
-        // Combine and sort data
+        // Combine the data into an array of objects for sorting
         const combinedData = carbonType.map((type, index) => ({
             type: type,
             value: totalCF[index]
         }));
 
-        // Sort combined data by value in descending order
+        // Sort the combined data by value in descending order
         combinedData.sort((a, b) => b.value - a.value);
 
-        // Extract sorted labels and data
+        // Extract the sorted carbon types and total CF values
         const sortedCarbonType = combinedData.map(item => item.type);
         const sortedTotalCF = combinedData.map(item => item.value);
 
         // Create gradient
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400); // Adjust the height as needed
+        const gradient = barCtx.createLinearGradient(0, 0, 0, 400); // Adjust the height as needed
         gradient.addColorStop(0, '#2c7873'); // Color for the biggest bar
         gradient.addColorStop(1, '#20B2AA'); // Color for the smallest bar
 
-        const data = {
-            labels: sortedCarbonType,
+        const barData = {
+            labels: sortedCarbonType, // Use sorted carbon types
             datasets: [{
                 label: 'Carbon Footprint', // Add a label for the dataset
                 backgroundColor: gradient, // Use the gradient for the bars
-                data: sortedTotalCF
+                data: sortedTotalCF // Use sorted total CF values
             }]
         };
 
         // Config Block
-        const config = {
+        const barConfig = {
             type: "bar",
-            data,
+            data: barData,
             options: {
                 plugins: {
                     legend: {
@@ -808,10 +907,11 @@ try {
                 }
             }
         };
+
         // Render Block
         const barChart = new Chart(
-            document.getElementById('barChart'),
-            config
+            barCtx,
+            barConfig // Use barConfig for the chart
         );
     </script>
 

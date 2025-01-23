@@ -1,3 +1,18 @@
+<?php
+$host = "mysql";
+$username = "root";
+$password = "rootpassword";
+$database = "cf";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "";
+} catch (PDOException $e) {
+    die("ERROR: Could not connect. " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,6 +38,8 @@
 
     <link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', Arial, sans-serif;
@@ -40,12 +57,14 @@
             padding: 20px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .back-icon {
+            position: absolute;
+            left: 20px;
             font-size: 36px;
             background-color: #20B2AA;
             border: #20B2AA;
@@ -73,16 +92,12 @@
 
         .monthpicker-container {
             display: flex;
-            justify-content: flex-start;
-            /* Change from center to flex-start */
+            justify-content: center;
             align-items: center;
-            margin: 2rem;
-            /* Change from margin: 2rem auto to just 2rem */
+            margin: 2rem auto;
             position: relative;
-            max-width: 300px;
-            /* If you want it further from the left edge */
-            margin-left: 3rem;
-            /* Add some space from the left edge */
+            text-align: center;
+            max-width: 500px;
         }
 
         #monthpicker {
@@ -120,6 +135,9 @@
         }
 
         .content-sec {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
             width: 1390px;
             padding: 10px;
@@ -157,8 +175,9 @@
         }
 
         .title {
-            padding-left: 30px;
+            text-align: center;
             color: #01696E;
+            margin: 0;
         }
 
         .content div {
@@ -171,8 +190,9 @@
             justify-content: center;
             align-items: center;
             margin: 20px auto;
-            max-width: 1000px;
+            max-width: 1100px;
             width: 170%;
+            height: fit-content;
         }
 
 
@@ -227,12 +247,54 @@
         <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
     </div>
 
+    <?php
+    $chartData = [];
+
+    $sql = "SELECT 
+            et.type AS emission_type,
+            est.sub_type,
+            COALESCE(SUM(ec.total_cf), 0) AS total_cf
+        FROM 
+            emission_types et
+        JOIN 
+            emission_sub_types est ON et.em_id = est.em_id
+        LEFT JOIN 
+            emission_calculations ec ON est.em_sub_id = ec.em_sub_id
+        WHERE 
+            et.type IN (
+                'Carbon Footprint จากการเผาไหม้เชื้อเพลิง', 
+                'Carbon Footprint จากการรั่วไหลและอื่นๆ', 
+                'Carbon Footprint จากการใช้พลังงาน', 
+                'Carbon Footprint ทางอ้อมอื่นๆ'
+            )
+        GROUP BY 
+            et.type, est.sub_type
+        ORDER BY 
+            CASE et.type
+                WHEN 'Carbon Footprint จากการเผาไหม้เชื้อเพลิง' THEN 1
+                WHEN 'Carbon Footprint จากการรั่วไหลและอื่นๆ' THEN 2
+                WHEN 'Carbon Footprint จากการใช้พลังงาน' THEN 3
+                WHEN 'Carbon Footprint ทางอ้อมอื่นๆ' THEN 4
+            END, 
+            total_cf DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $chartData[$row['emission_type']][] = [
+            'subtype' => $row['sub_type'],
+            'total_cf' => floatval($row['total_cf'])
+        ];
+    }
+    ?>
+
     <div class="content-sec">
         <h2 class="title">Carbon Footprint จากการเผาไหม้เชื้อเพลิง</h2>
         <div class="content">
             <div class="flex-container">
                 <div class="chart-container">
-                    <canvas id="Chart1"></canvas>
+                    <canvas id="CombustionChart"></canvas>
                 </div>
             </div>
         </div>
@@ -250,7 +312,7 @@
         <div class="content">
             <div class="flex-container">
                 <div class="chart-container">
-                    <canvas id="Chart2"></canvas>
+                    <canvas id="LeakageChart"></canvas>
                 </div>
             </div>
         </div>
@@ -268,7 +330,7 @@
         <div class="content">
             <div class="flex-container">
                 <div class="chart-container">
-                    <canvas id="Chart3"></canvas>
+                    <canvas id="EnergyChart"></canvas>
                 </div>
             </div>
         </div>
@@ -286,7 +348,7 @@
         <div class="content">
             <div class="flex-container">
                 <div class="chart-container">
-                    <canvas id="Chart4"></canvas>
+                    <canvas id="IndirectChart"></canvas>
                 </div>
             </div>
         </div>
@@ -321,77 +383,56 @@
             });
         });
 
-        // Sample data for the four charts
-        const chart1Data = [55, 49, 47, 44, 40];
-        const chart2Data = [60, 50, 45, 40, 35];
-        const chart3Data = [70, 65, 60, 55, 50];
-        const chart4Data = [80, 75, 70, 65, 60];
 
-        // Function to create a horizontal bar chart
-        function createHorizontalBarChart(chartId, labels, data, title) {
-            const ctx = document.getElementById(chartId).getContext('2d');
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = <?php echo json_encode($chartData); ?>;
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '#2c7873');
-            gradient.addColorStop(1, '#20B2AA');
-
-            const chartData = {
-                labels: labels,
-                datasets: [{
-                    label: title,
-                    backgroundColor: gradient,
-                    data: data
-                }]
-            };
-
-            const config = {
-                type: 'horizontalBar',
-                data: chartData,
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: title,
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
+            function createHorizontalBarChart(ctx, labels, values) {
+                return new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Carbon Footprint (kg CO2e)',
+                            data: values,
+                            backgroundColor: 'rgba(32, 178, 170, 0.7)',
+                            borderColor: '#01696E',
+                            borderWidth: 1
+                        }]
                     },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
                             title: {
-                                display: true,
-                                text: 'Value',
-                                font: {
-                                    weight: 'bold'
-                                }
+                                display: false // Hide the title
                             }
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Categories',
-                                font: {
-                                    weight: 'bold'
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Carbon Footprint (kg CO2e)'
                                 }
                             }
                         }
                     }
-                }
-            };
+                });
+            }
 
-            new Chart(ctx, config);
-        }
+            // Create charts for each emission type
+            Object.keys(chartData).forEach((emissionType, index) => {
+                const chartId = ['CombustionChart', 'LeakageChart', 'EnergyChart', 'IndirectChart'][index];
+                const ctx = document.getElementById(chartId).getContext('2d');
 
-        // Create the charts
-        createHorizontalBarChart('Chart1', ['A', 'B', 'C', 'D', 'E'], chart1Data, 'Chart 1 Title');
-        createHorizontalBarChart('Chart2', ['A', 'B', 'C', 'D', 'E'], chart2Data, 'Chart 2 Title');
-        createHorizontalBarChart('Chart3', ['A', 'B', 'C', 'D', 'E'], chart3Data, 'Chart 3 Title');
-        createHorizontalBarChart('Chart4', ['A', 'B', 'C', 'D', 'E'], chart4Data, 'Chart 4 Title');
+                const labels = chartData[emissionType].map(item => item.subtype);
+                const values = chartData[emissionType].map(item => item.total_cf);
+
+                createHorizontalBarChart(ctx, labels, values, emissionType);
+            });
+        });
     </script>
 
     <footer class="footer">

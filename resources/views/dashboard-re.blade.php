@@ -17,23 +17,27 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carbon Footprint - MedCMU</title>
-<link rel="icon" href="\images\leaf-solid.svg" type="image/png">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint - MedCMU</title>
+    <link rel="icon" href="\images\leaf-solid.svg" type="image/png">
 
-<!-- Load jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Load jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Then load jQuery UI -->
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- Load Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 
-<!-- Then load Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <!-- Load Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 
-<!-- Other scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <!-- Load jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+</head>
 
 <style>
     body {
@@ -57,6 +61,8 @@ try {
         padding: 25px;
         display: flex;
         align-items: center;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
     .header h1 {
@@ -170,31 +176,52 @@ try {
 
     .show-carbon {
         margin: 40px auto;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.95));
         border: 2px solid #01696E;
         border-radius: 100px;
-        padding: 20px;
-        max-width: 25%;
+        padding: 30px 40px;
+        max-width: 500px;
         text-align: center;
+        box-shadow: 0 4px 15px rgba(1, 105, 110, 0.1);
+        backdrop-filter: blur(5px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
+    .show-carbon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(1, 105, 110, 0.15);
     }
 
     .carbon-type {
         text-align: center;
-        font-size: 15px;
+        font-size: 1.1rem;
         color: #01696E;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
     }
 
     .carbon-value {
-        margin-top: 10px;
+        margin: 15px 0;
         text-align: center;
-        font-size: 36px;
+        font-size: 2.8rem;
+        font-weight: 600;
         color: #20B2AA;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .carbon-value:hover {
+        transform: scale(1.02);
     }
 
     .carbon-unit {
-        font-size: 20px;
+        display: block;
+        text-align: center;
+        font-size: 1.25rem;
         color: #01696E;
+        opacity: 0.9;
+        margin-top: 5px;
     }
 
     .icon-container {
@@ -423,7 +450,6 @@ try {
         display: none;
     }
 </style>
-</head>
 
 <body>
     <div class="header">
@@ -435,10 +461,56 @@ try {
         <h3><b>คาร์บอนฟุตพริ้นท์ คณะแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่</b></h3>
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
+    <!-- line chart -->
+    <?php
+    // Fetch data for emissions by year
+    $sqlEmissions = "SELECT year, 
+                             SUM(total_cf) AS total_emission
+                      FROM emission_calculations
+                      GROUP BY year
+                      ORDER BY YEAR";
+
+    $stmtEmissions = $pdo->prepare($sqlEmissions);
+    $stmtEmissions->execute();
+
+    $years = [];
+    $emissions = [];
+    $reductions = []; // Initialize reductions array
+
+    while ($row = $stmtEmissions->fetch(PDO::FETCH_ASSOC)) {
+        $years[] = $row['year']; // This will be the year
+        $emissions[] = $row['total_emission'];
+        $reductions[] = 0; // Initialize reductions to 0 for each year
+    }
+
+    // Fetch data for reductions by year
+    $sqlReductions = "SELECT year, 
+                             SUM(total_cf) AS total_reduction
+                      FROM reduction_calculations
+                      GROUP BY year
+                      ORDER BY year";
+    $stmtReductions = $pdo->prepare($sqlReductions);
+    $stmtReductions->execute();
+
+    while ($row = $stmtReductions->fetch(PDO::FETCH_ASSOC)) {
+        // Ensure that the year exists in the years array
+        $index = array_search($row['year'], $years);
+        if ($index !== false) {
+            // If it exists, add the reduction to the corresponding year
+            $reductions[$index] += $row['total_reduction'];
+        } else {
+            // If it doesn't exist, add a new entry
+            $years[] = $row['year'];
+            $emissions[] = 0; // No emissions for this year
+            $reductions[] = $row['total_reduction'];
+        }
+    }
+    ?>
     <div class="chart-container">
-        <canvas id="carbonChart"></canvas>
+        <canvas id="lineChart"></canvas>
     </div>
     <div class="container">
+        <!-- show progress bar -->
         <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
         <!-- labels -->
         <div class="progress-labels">
@@ -497,6 +569,36 @@ try {
 
 
     <!-- show overall carbon reduction -->
+    <script>
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                // Use easing function for smoother animation
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentNumber = progress * (end - start) + start;
+
+                obj.innerHTML = currentNumber.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Start the animation when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const carbonCounter = document.getElementById('carbonCounter');
+            const finalValue = parseFloat(document.getElementById('finalValue').value);
+            animateValue(carbonCounter, 0, finalValue, 2000); // 2000ms = 2 seconds duration
+        });
+    </script>
     <div class="show-carbon">
         <div class="carbon-type">รวมการลดการปล่อยคาร์บอนทั้งหมดในคณะแพทยศาสตร์</div>
         <div class="carbon-value">
@@ -576,53 +678,59 @@ try {
         <canvas id="barChart" style="width:100%;max-width:1200px"></canvas>
     </div>
 
+
     <script>
-        // Carbon Footprint Chart
-        const carbonCtx = document.getElementById('carbonChart').getContext('2d');
-        new Chart(carbonCtx, {
-            type: 'line',
-            data: {
-                labels: ['2565', '2566'], //connect database
-                datasets: [{
-                    label: 'การปล่อยคาร์บอน (Emission)',
-                    data: [50, 45, ], //connect database
-                    borderColor: '#ff6b6b',
-                    backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'การลดการปล่อยคาร์บอน (Reduction)',
-                    data: [25, 20, ], //connect database
-                    borderColor: '#4ecdc4',
-                    backgroundColor: 'rgba(78, 205, 196, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
+        // Line chart setup
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+
+        // Setup Block
+        const years = <?php echo json_encode($years); ?>; // Use years for x-axis labels
+        const emissions = <?php echo json_encode($emissions); ?>;
+        const reductions = <?php echo json_encode($reductions); ?>;
+
+        // Create datasets
+        const datasets = [{
+                label: 'Emissions',
+                data: emissions,
+                borderColor: 'rgba(255, 99, 132, 1)', // Line color for emissions
+                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Optional background for fill
+                borderWidth: 2, // Line thickness
+                fill: false // No fill under the line
             },
+            {
+                label: 'Reductions',
+                data: reductions,
+                borderColor: 'rgba(54, 162, 235, 1)', // Line color for reductions
+                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Optional background for fill
+                borderWidth: 2, // Line thickness
+                fill: false // No fill under the line
+            }
+        ];
+
+        const lineData = {
+            labels: years, // X-axis labels
+            datasets: datasets // Add datasets for emissions and reductions
+        };
+
+        // Config Block
+        const LineConfig = {
+            type: 'line',
+            data: lineData, // Use lineData for the data source
             options: {
-                responsive: true,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Carbon Footprint Over Time'
-                    },
                     legend: {
-                        display: true,
+                        display: true, // Display the legend
                         position: 'top'
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += context.raw;
-                                return label + ' metric tons';
-                            }
+                    title: {
+                        display: true,
+                        text: 'Annual Emissions and Reductions',
+                        font: {
+                            weight: 'bold'
                         }
                     }
                 },
+                responsive: true, // Make the chart responsive
                 scales: {
                     x: {
                         title: {
@@ -631,21 +739,41 @@ try {
                             font: {
                                 weight: 'bold'
                             }
+                        },
+                        ticks: {
+                            font: {
+                                size: 12 // Adjust font size for better readability
+                            }
                         }
                     },
                     y: {
+                        beginAtZero: true, // Start Y-axis at zero
                         title: {
                             display: true,
-                            text: 'Carbon Emissions (TonCO2-eq)',
+                            text: 'Values',
                             font: {
                                 weight: 'bold'
                             }
                         },
-                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 12 // Adjust font size for better readability
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)', // Light grid color for better visibility
+                            lineWidth: 1 // Adjust grid line width
+                        }
                     }
                 }
             }
-        });
+        };
+
+        // Render Block
+        const lineChart = new Chart(
+            lineCtx,
+            LineConfig // Use LineConfig for the chart
+        );
 
         // Month picker initialization
         $(document).ready(function() {
@@ -662,6 +790,26 @@ try {
                 }
             });
         });
+
+        // Function to fetch data based on selected month and year
+        function fetchData(month, year) {
+            $.ajax({
+                url: 'path/to/your/php/script.php', // Update with the correct path to your PHP script
+                type: 'POST',
+                data: {
+                    month: month,
+                    year: year
+                },
+                success: function(response) {
+                    // Assuming response is JSON containing totalCF and carbonType
+                    const data = JSON.parse(response);
+                    updateChart(data.totalCF, data.carbonType); // Call function to update the chart
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
 
         // Bar chart setup
         const ctx = document.getElementById('barChart').getContext('2d');

@@ -36,8 +36,8 @@ try {
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-
 </head>
+
 <style>
     body {
         font-family: 'Kanit', Arial, sans-serif;
@@ -679,7 +679,6 @@ try {
     <div class="bar-container">
         <canvas id="barChart" onclick="location.href='emission-detail'"></canvas>
     </div>
-
 
 
     <script>

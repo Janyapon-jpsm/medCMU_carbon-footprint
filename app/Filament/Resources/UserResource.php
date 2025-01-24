@@ -56,7 +56,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('user_id')
                     ->sortable()
                     ->searchable()
-                    ->label('ไอดี'),
+                    ->label('User ID'),
                 Tables\Columns\TextColumn::make('roles')
                     ->sortable()
                     ->searchable()

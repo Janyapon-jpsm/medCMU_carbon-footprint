@@ -609,7 +609,8 @@ try {
             $stmt->execute();
             $totalReduction = $stmt->fetchColumn(); // Fetch the total reduction value
             ?>
-            <?php echo number_format($totalReduction, 2); ?> <!-- Display the total reduction -->
+            <span id="carbonCounter">0</span> <!-- We'll animate this -->
+            <input type="hidden" id="finalValue" value="<?php echo $totalReduction; ?>">
         </div>
         <span class="carbon-unit">kg CO2e</span>
     </div>

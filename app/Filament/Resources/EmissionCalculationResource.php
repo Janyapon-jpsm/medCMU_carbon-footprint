@@ -56,11 +56,13 @@ class EmissionCalculationResource extends Resource
 
                             // Set the emission factor
                             $set('em_factor', $emissionSubType->emission_factor ?? 0);
+                            $set('unit', $emissionSubType->unit ?? 0);
                         } else {
                             // Reset fields if no subtype is selected
                             $set('em_id', null);
                             $set('em_type_name', 'Unknown');
                             $set('em_factor', 0);
+                            $set('unit', null);
                         }
                     }),
                 Hidden::make('em_id')
@@ -105,6 +107,11 @@ class EmissionCalculationResource extends Resource
                         $emFactor = $get('em_factor') ?? 0;
                         $set('total_cf', $amount * $emFactor); // Dynamically calculate total
                     }),
+                TextInput::make('unit')
+                    ->label('Unit')
+                    ->required()
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->emissionSubType?->unit ?? null),
                 TextInput::make('em_factor')
                     ->label('Emission Factor')
                     ->required()

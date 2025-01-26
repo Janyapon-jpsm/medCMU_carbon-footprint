@@ -55,11 +55,13 @@ class ReductionCalculationResource extends Resource
 
                             // Set the emission factor
                             $set('em_factor', $reductionSubType->emission_factor ?? 0);
+                            $set('unit', $reductionSubType->unit ?? 0);
                         } else {
                             // Reset fields if no subtype is selected
                             $set('re_id', null);
                             $set('re_type_name', 'Unknown');
                             $set('em_factor', 0);
+                            $set('unit', null);
                         }
                     }),
                 Hidden::make('re_id')
@@ -104,6 +106,11 @@ class ReductionCalculationResource extends Resource
                         $emFactor = $get('em_factor') ?? 0;
                         $set('total_cf', $amount * $emFactor); // Dynamically calculate total
                     }),
+                TextInput::make('unit')
+                    ->label('Unit')
+                    ->required()
+                    ->readOnly()
+                    ->formatStateUsing(fn($state, $record) => $record?->reductionSubType?->unit ?? null),
                 TextInput::make('em_factor')
                     ->label('Emission Factor')
                     ->required()

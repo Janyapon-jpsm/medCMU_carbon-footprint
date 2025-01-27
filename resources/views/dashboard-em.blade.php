@@ -610,7 +610,7 @@ try {
             $stmt->execute();
             $totalEmission = $stmt->fetchColumn(); // Fetch the total emission value
             ?>
-            <span id="carbonCounter">0</span> <!-- We'll animate this -->
+            <span id="carbonCounter">0</span>
             <input type="hidden" id="finalValue" value="<?php echo $totalEmission; ?>">
         </div>
         <span class="carbon-unit">kg CO2e</span>

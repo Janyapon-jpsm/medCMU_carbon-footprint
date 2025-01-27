@@ -198,6 +198,10 @@ class EmissionCalculationResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->label('ลบ'),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(EmissionCalculationExporter::class)
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

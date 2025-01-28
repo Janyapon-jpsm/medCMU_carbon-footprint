@@ -14,11 +14,25 @@ class EmissionCalculationExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('month'),
+            ExportColumn::make('month')
+                ->formatStateUsing(fn($state) => [
+                    1 => 'Jan',
+                    2 => 'Feb',
+                    3 => 'Mar',
+                    4 => 'Apr',
+                    5 => 'May',
+                    6 => 'Jun',
+                    7 => 'Jul',
+                    8 => 'Aug',
+                    9 => 'Sep',
+                    10 => 'Oct',
+                    11 => 'Nov',
+                    12 => 'Dec',
+                ][$state] ?? 'Unknown'),
             ExportColumn::make('year'),
-            ExportColumn::make('em_id')
+            ExportColumn::make('emissionType.type')
                 ->label('Emission Type'),
-            ExportColumn::make('em_sub_id')
+            ExportColumn::make('emissionSubType.sub_type')
                 ->label('Emission Sub Type'),
             ExportColumn::make('total_cf')
                 ->label('Total Carbon Footprint'),

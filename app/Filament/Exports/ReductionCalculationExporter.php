@@ -14,11 +14,25 @@ class ReductionCalculationExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('month'),
+            ExportColumn::make('month')
+                ->formatStateUsing(fn($state) => [
+                    1 => 'Jan',
+                    2 => 'Feb',
+                    3 => 'Mar',
+                    4 => 'Apr',
+                    5 => 'May',
+                    6 => 'Jun',
+                    7 => 'Jul',
+                    8 => 'Aug',
+                    9 => 'Sep',
+                    10 => 'Oct',
+                    11 => 'Nov',
+                    12 => 'Dec',
+                ][$state] ?? 'Unknown'),
             ExportColumn::make('year'),
-            ExportColumn::make('re_id')
+            ExportColumn::make('reductionType.type')
                 ->label('Reduction Type'),
-            ExportColumn::make('re_sub_id')
+            ExportColumn::make('reductionSubType.sub_type')
                 ->label('Reduction Sub Type'),
             ExportColumn::make('total_cf')
                 ->label('Total Carbon Footprint'),

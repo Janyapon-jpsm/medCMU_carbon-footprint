@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmissionCalculationResource\Pages;
 use App\Models\EmissionCalculation;
-use App\Filament\Exports\EmissionCalculationExporter;
 use App\Models\EmissionSubType;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
@@ -16,7 +15,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Select;
-use Filament\Tables\Actions\ExportAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Auth;
 
@@ -197,10 +195,6 @@ class EmissionCalculationResource extends Resource
                     ->label('แก้ไข'),
                 Tables\Actions\DeleteAction::make()
                     ->label('ลบ'),
-            ])
-            ->headerActions([
-                ExportAction::make()
-                    ->exporter(EmissionCalculationExporter::class)
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

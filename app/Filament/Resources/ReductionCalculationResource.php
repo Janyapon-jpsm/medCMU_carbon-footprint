@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReductionCalculationResource\Pages;
 use App\Models\ReductionCalculation;
-use App\Filament\Exports\ReductionCalculationExporter;
 use App\Models\ReductionSubType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Hidden;
@@ -18,8 +17,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use Filament\Tables\Actions\ExportAction;
-
 
 class ReductionCalculationResource extends Resource
 {
@@ -198,10 +195,6 @@ class ReductionCalculationResource extends Resource
                     ->label('แก้ไข'),
                 Tables\Actions\DeleteAction::make()
                     ->label('ลบ'),
-            ])
-            ->headerActions([
-                ExportAction::make()
-                    ->exporter(ReductionCalculationExporter::class)
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

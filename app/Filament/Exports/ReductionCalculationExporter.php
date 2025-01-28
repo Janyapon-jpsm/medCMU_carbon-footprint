@@ -16,9 +16,12 @@ class ReductionCalculationExporter extends Exporter
         return [
             ExportColumn::make('month'),
             ExportColumn::make('year'),
-            ExportColumn::make('re_id'),
-            ExportColumn::make('re_sub_id'),
-            ExportColumn::make('total_cf'),
+            ExportColumn::make('re_id')
+                ->label('Reduction Type'),
+            ExportColumn::make('re_sub_id')
+                ->label('Reduction Sub Type'),
+            ExportColumn::make('total_cf')
+                ->label('Total Carbon Footprint'),
         ];
     }
 

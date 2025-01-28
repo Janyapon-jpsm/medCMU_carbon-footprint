@@ -16,9 +16,12 @@ class EmissionCalculationExporter extends Exporter
         return [
             ExportColumn::make('month'),
             ExportColumn::make('year'),
-            ExportColumn::make('em_id'),
-            ExportColumn::make('em_sub_id'),
-            ExportColumn::make('total_cf'),
+            ExportColumn::make('em_id')
+                ->label('Emission Type'),
+            ExportColumn::make('em_sub_id')
+                ->label('Emission Sub Type'),
+            ExportColumn::make('total_cf')
+                ->label('Total Carbon Footprint'),
         ];
     }
 

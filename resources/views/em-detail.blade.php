@@ -191,8 +191,8 @@ try {
             align-items: center;
             margin: 20px auto;
             max-width: 1100px;
-            width: 170%;
-            height: fit-content;
+            width: 180%;
+            height: 400px;
         }
 
 

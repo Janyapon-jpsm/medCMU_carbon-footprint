@@ -475,12 +475,12 @@ try {
 
     $years = [];
     $emissions = [];
-    $reductions = []; // Initialize reductions array
+    $reductions = [];
 
     while ($row = $stmtEmissions->fetch(PDO::FETCH_ASSOC)) {
-        $years[] = $row['year']; // This will be the year
+        $years[] = $row['year'];
         $emissions[] = $row['total_emission'];
-        $reductions[] = 0; // Initialize reductions to 0 for each year
+        $reductions[] = 0;
     }
 
     // Fetch data for reductions by year
@@ -493,15 +493,12 @@ try {
     $stmtReductions->execute();
 
     while ($row = $stmtReductions->fetch(PDO::FETCH_ASSOC)) {
-        // Ensure that the year exists in the years array
         $index = array_search($row['year'], $years);
         if ($index !== false) {
-            // If it exists, add the reduction to the corresponding year
             $reductions[$index] += $row['total_reduction'];
         } else {
-            // If it doesn't exist, add a new entry
             $years[] = $row['year'];
-            $emissions[] = 0; // No emissions for this year
+            $emissions[] = 0;
             $reductions[] = $row['total_reduction'];
         }
     }
@@ -627,8 +624,8 @@ try {
     <!-- bar chart -->
     <?php
     // Initialize the variable
-    $totalCF = []; // Ensure this is defined before use
-    $carbonType = []; // Initialize this as well
+    $totalCF = [];
+    $carbonType = [];
 
     // Get month and year from POST request
     $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because month is 0-indexed
@@ -694,34 +691,34 @@ try {
         const datasets = [{
                 label: 'Emissions',
                 data: emissions,
-                borderColor: 'rgba(255, 99, 132, 1)', // Line color for emissions
-                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Optional background for fill
-                borderWidth: 2, // Line thickness
-                fill: false // No fill under the line
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 2,
+                fill: true
             },
             {
                 label: 'Reductions',
                 data: reductions,
-                borderColor: 'rgba(54, 162, 235, 1)', // Line color for reductions
-                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Optional background for fill
-                borderWidth: 2, // Line thickness
-                fill: false // No fill under the line
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2,
+                fill: true
             }
         ];
 
         const lineData = {
-            labels: years, // X-axis labels
-            datasets: datasets // Add datasets for emissions and reductions
+            labels: years,
+            datasets: datasets
         };
 
         // Config Block
         const LineConfig = {
             type: 'line',
-            data: lineData, // Use lineData for the data source
+            data: lineData,
             options: {
                 plugins: {
                     legend: {
-                        display: true, // Display the legend
+                        display: true,
                         position: 'top'
                     },
                     title: {
@@ -732,7 +729,7 @@ try {
                         }
                     }
                 },
-                responsive: true, // Make the chart responsive
+                responsive: true,
                 scales: {
                     x: {
                         title: {
@@ -744,7 +741,7 @@ try {
                         },
                         ticks: {
                             font: {
-                                size: 12 // Adjust font size for better readability
+                                size: 12
                             }
                         }
                     },
@@ -759,12 +756,12 @@ try {
                         },
                         ticks: {
                             font: {
-                                size: 12 // Adjust font size for better readability
+                                size: 12
                             }
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.1)', // Light grid color for better visibility
-                            lineWidth: 1 // Adjust grid line width
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            lineWidth: 1
                         }
                     }
                 }
@@ -774,7 +771,7 @@ try {
         // Render Block
         const lineChart = new Chart(
             lineCtx,
-            LineConfig // Use LineConfig for the chart
+            LineConfig
         );
 
         // Month picker initialization

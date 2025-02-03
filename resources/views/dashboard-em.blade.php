@@ -36,6 +36,8 @@ try {
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
 </head>
 
 <style>
@@ -414,40 +416,6 @@ try {
         position: relative;
         max-width: 300px;
     }
-
-    #monthpicker {
-        width: 100%;
-        padding: 1rem 3rem;
-        border: 2px solid #20B2AA;
-        border-radius: 25px;
-        font-size: 1.1rem;
-        text-align: center;
-        outline: none;
-        background-color: white;
-        color: #2c3e50;
-        cursor: pointer;
-        font-family: 'Kanit', Arial, sans-serif;
-    }
-
-    .calendar-icon {
-        position: absolute;
-        left: 1rem;
-        color: #20B2AA;
-        font-size: 1.2rem;
-        pointer-events: none;
-    }
-
-    /* Basic datepicker styling */
-    .ui-datepicker {
-        padding: 1rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .ui-datepicker-calendar {
-        display: none;
-    }
 </style>
 
 <body>
@@ -615,63 +583,52 @@ try {
 
     <!-- month picker -->
     <div class="monthpicker-container">
-        <span class="calendar-icon">
-            <i class="fas fa-calendar-alt"></i>
-        </span>
-        <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
+        <input type="month" id="monthpicker" onchange="filterChart(this)" />
     </div>
 
     <!-- bar chart -->
     <?php
-    // Initialize the variable
-    $totalCF = [];
-    $carbonType = [];
-
-    // Get month and year from POST request
-    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because month is 0-indexed
-    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null; // Default to current year
+    // Check if month and year are provided
+    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because JS months are 0-indexed
+    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null;
 
     try {
         if ($selectedMonth && $selectedYear) {
             // Query for specific month and year
-            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint
-                    FROM emission_calculations ec
-                    JOIN emission_types et ON ec.em_id = et.em_id
-                    WHERE MONTH(ec.month) = :month AND YEAR(ec.year) = :year
-                    GROUP BY et.type";
+            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint 
+                    FROM emission_calculations ec 
+                    JOIN emission_types et ON ec.em_id = et.em_id 
+                    WHERE MONTH(ec.month) = :month 
+                    AND YEAR(ec.year) = :year 
+                    GROUP BY et.type 
+                    ORDER BY total_carbon_footprint DESC";
 
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
             $stmt->bindParam(':year', $selectedYear, PDO::PARAM_INT);
         } else {
-            // Query for overall data if no date is selected
-            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint
-                    FROM emission_calculations ec
-                    JOIN emission_types et ON ec.em_id = et.em_id
-                    GROUP BY et.type";
+            // Query for all-time data
+            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint 
+                    FROM emission_calculations ec 
+                    JOIN emission_types et ON ec.em_id = et.em_id 
+                    GROUP BY et.type 
+                    ORDER BY total_carbon_footprint DESC";
 
             $stmt = $pdo->prepare($sql);
         }
 
         $stmt->execute();
 
-        if ($stmt->rowCount() > 0) {
-            $totalCF = [];
-            $carbonType = [];
+        $totalCF = [];
+        $carbonType = [];
 
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $totalCF[] = $row["total_carbon_footprint"];
-                $carbonType[] = $row["type"];
-            }
-        } else {
-            echo "No records matching your query were found.";
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $totalCF[] = floatval($row["total_carbon_footprint"]);
+            $carbonType[] = $row["type"];
         }
     } catch (PDOException $e) {
-        die("ERROR: Could not execute $sql. " . $e->getMessage());
+        echo "Error: " . $e->getMessage();
     }
-
-    // Close connection
-    unset($pdo);
     ?>
     <div class="bar-container">
         <canvas id="barChart" onclick="location.href='emission-detail'"></canvas>
@@ -774,75 +731,19 @@ try {
             LineConfig
         );
 
-        // Month picker initialization
-        $(document).ready(function() {
-            $("#monthpicker").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: 'MM yy',
-                onClose: function(dateText, inst) {
-                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                    $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
-
-                    // Call a function to fetch data based on the selected month and year
-                    fetchData(month, year);
-                }
-            });
-        });
-
-        // Function to fetch data based on selected month and year
-        function fetchData(month, year) {
-            $.ajax({
-                url: 'path/to/your/php/script.php', // Update with the correct path to your PHP script
-                type: 'POST',
-                data: {
-                    month: month,
-                    year: year
-                },
-                success: function(response) {
-                    // Assuming response is JSON containing totalCF and carbonType
-                    const data = JSON.parse(response);
-                    updateChart(data.totalCF, data.carbonType); // Call function to update the chart
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-            });
-        }
-
         // Bar chart setup
         const barCtx = document.getElementById('barChart').getContext('2d');
 
-        // Assuming you have similar data fetching logic for the bar chart
-        const totalCF = <?php echo json_encode($totalCF); ?>; // Ensure this is defined
-        const carbonType = <?php echo json_encode($carbonType); ?>; // Ensure this is defined
+        const totalCF = <?php echo json_encode($totalCF); ?>;
+        const carbonType = <?php echo json_encode($carbonType); ?>;
 
-        // Combine the data into an array of objects for sorting
-        const combinedData = carbonType.map((type, index) => ({
-            type: type,
-            value: totalCF[index]
-        }));
-
-        // Sort the combined data by value in descending order
-        combinedData.sort((a, b) => b.value - a.value);
-
-        // Extract the sorted carbon types and total CF values
-        const sortedCarbonType = combinedData.map(item => item.type);
-        const sortedTotalCF = combinedData.map(item => item.value);
-
-        // Create gradient
-        const gradient = barCtx.createLinearGradient(0, 0, 0, 400); // Adjust the height as needed
-        gradient.addColorStop(0, '#2c7873'); // Color for the biggest bar
-        gradient.addColorStop(1, '#20B2AA'); // Color for the smallest bar
-
+        // Create bar chart data (no sorting)
         const barData = {
-            labels: sortedCarbonType, // Use sorted carbon types
+            labels: carbonType, // Use the original carbonType array
             datasets: [{
-                label: 'Carbon Footprint', // Add a label for the dataset
-                backgroundColor: gradient, // Use the gradient for the bars
-                data: sortedTotalCF // Use sorted total CF values
+                label: 'Carbon Footprint',
+                backgroundColor: '#20B2AA',
+                data: totalCF
             }]
         };
 
@@ -853,7 +754,7 @@ try {
             options: {
                 plugins: {
                     legend: {
-                        display: true // Set to true to display the legend
+                        display: true
                     },
                     title: {
                         display: true,
@@ -875,15 +776,15 @@ try {
                         },
                         ticks: {
                             callback: function(value) {
-                                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Format numbers with commas
+                                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             },
                             font: {
-                                size: 12 // Adjust font size for better readability
+                                size: 12
                             }
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.1)', // Light grid color for better visibility
-                            lineWidth: 1 // Adjust grid line width
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            lineWidth: 1
                         }
                     },
                     x: {
@@ -896,7 +797,7 @@ try {
                         },
                         ticks: {
                             font: {
-                                size: 12 // Adjust font size for better readability
+                                size: 12
                             }
                         }
                     }
@@ -907,8 +808,16 @@ try {
         // Render Block
         const barChart = new Chart(
             barCtx,
-            barConfig // Use barConfig for the chart
+            barConfig
         );
+
+        function filterChart(monthPicker) {
+            const selectedDate = monthPicker.value;
+            const year = selectedDate.substring(0, 4);
+            const month = parseInt(selectedDate.substring(5, 7));
+            console.log(month);
+            console.log(year);
+        }
     </script>
 
     <footer class="footer">

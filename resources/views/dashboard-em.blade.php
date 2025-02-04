@@ -498,7 +498,6 @@
         <span class="carbon-unit">kg CO2e</span>
     </div>
 
-    <!-- Add this script right after the show-carbon div -->
     <script>
         // Counter animation
         const counter = document.getElementById('carbonCounter');

@@ -48,13 +48,13 @@ class DashboardController extends Controller
         $totalEmissions = DB::table('emission_calculations')->sum('total_cf');
         $totalReductions = DB::table('reduction_calculations')->sum('total_cf');
         $total = $totalEmissions + $totalReductions;
-        
+
         $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0;
         $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0;
 
         // Get carbon footprint by type with date filter
         $selectedDate = $request->input('selected_date');
-        
+
         $carbonFootprintQuery = DB::table('emission_calculations as ec')
             ->join('emission_types as et', 'ec.em_id', '=', 'et.em_id')
             ->select('et.type', DB::raw('SUM(ec.total_cf) as total_carbon_footprint'));
@@ -62,14 +62,14 @@ class DashboardController extends Controller
         if ($selectedDate) {
             $year = date('Y', strtotime($selectedDate));
             $month = (int)date('m', strtotime($selectedDate));
-            
+
             $carbonFootprintQuery->where('ec.year', $year)
-                                ->where('ec.month', $month);
+                ->where('ec.month', $month);
         }
 
         $carbonFootprintData = $carbonFootprintQuery->groupBy('et.type')
-                                                   ->orderByDesc('total_carbon_footprint')
-                                                   ->get();
+            ->orderByDesc('total_carbon_footprint')
+            ->get();
 
         $totalCF = [];
         $carbonType = [];
@@ -90,4 +90,4 @@ class DashboardController extends Controller
             'carbonType' => $carbonType
         ]);
     }
-} 
+}

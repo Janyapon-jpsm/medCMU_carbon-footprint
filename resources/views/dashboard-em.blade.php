@@ -401,6 +401,34 @@
         position: relative;
         max-width: 300px;
     }
+
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .filter-button {
+        padding: 8px 20px;
+        background-color: #20B2AA;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .filter-button:hover {
+        background-color: #01696E;
+    }
+
+    #monthpicker {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
 </style>
 
 <body>
@@ -496,7 +524,10 @@
 
     <!-- month picker -->
     <div class="monthpicker-container">
-        <input type="month" id="monthpicker" onchange="filterChart(this)" />
+        <form id="filterForm" action="{{ route('dashboard.emission') }}" method="GET" class="filter-form">
+            <input type="month" id="monthpicker" name="selected_date" value="{{ request('selected_date') }}" />
+            <button type="submit" class="filter-button">Filter</button>
+        </form>
     </div>
 
     <!-- bar chart -->
@@ -680,13 +711,15 @@
             barConfig
         );
 
-        function filterChart(monthPicker) {
-            const selectedDate = monthPicker.value;
-            const year = selectedDate.substring(0, 4);
-            const month = parseInt(selectedDate.substring(5, 7));
-            console.log(month);
-            console.log(year);
-        }
+        // Set default value to current month if no filter is applied
+        window.addEventListener('DOMContentLoaded', (event) => {
+            if (!document.getElementById('monthpicker').value) {
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const year = now.getFullYear();
+                document.getElementById('monthpicker').value = `${year}-${month}`;
+            }
+        });
     </script>
 
     <footer class="footer">

@@ -498,6 +498,7 @@
         <span class="carbon-unit">kg CO2e</span>
     </div>
 
+    <!-- Add this script right after the show-carbon div -->
     <script>
         // Counter animation
         const counter = document.getElementById('carbonCounter');
@@ -662,7 +663,9 @@
         const totalCF = @json($totalCF);
         const carbonType = @json($carbonType);
 
-        // Create bar chart data (no sorting)
+
+
+        // Create bar chart data
         const barData = {
             labels: carbonType, // Use the original carbonType array
             datasets: [{

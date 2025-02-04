@@ -1,19 +1,3 @@
-<?php
-
-$host = "mysql";
-$username = "root";
-$password = "rootpassword";
-$database = "cf";
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
-    echo "";
-} catch (PDOException $e) {
-    die("ERROR: Could not connect. " . $e->getMessage());
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -416,38 +400,32 @@ try {
         max-width: 300px;
     }
 
-    #monthpicker {
-        width: 100%;
-        padding: 1rem 3rem;
-        border: 2px solid #20B2AA;
-        border-radius: 25px;
-        font-size: 1.1rem;
-        text-align: center;
-        outline: none;
-        background-color: white;
-        color: #2c3e50;
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .filter-button {
+        padding: 8px 20px;
+        background-color: #20B2AA;
+        color: white;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
-        font-family: 'Kanit', Arial, sans-serif;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
     }
 
-    .calendar-icon {
-        position: absolute;
-        left: 1rem;
-        color: #20B2AA;
-        font-size: 1.2rem;
-        pointer-events: none;
+    .filter-button:hover {
+        background-color: #01696E;
     }
 
-    /* Basic datepicker styling */
-    .ui-datepicker {
-        padding: 1rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .ui-datepicker-calendar {
-        display: none;
+    #monthpicker {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
     }
 </style>
 
@@ -462,53 +440,10 @@ try {
         <h4>ตั้งแต่ปี 2565 - ปัจจุบัน</h4>
     </div>
     <!-- line chart -->
-    <?php
-    // Fetch data for emissions by year
-    $sqlEmissions = "SELECT year, 
-                             SUM(total_cf) AS total_emission
-                      FROM emission_calculations
-                      GROUP BY year
-                      ORDER BY YEAR";
-
-    $stmtEmissions = $pdo->prepare($sqlEmissions);
-    $stmtEmissions->execute();
-
-    $years = [];
-    $emissions = [];
-    $reductions = []; // Initialize reductions array
-
-    while ($row = $stmtEmissions->fetch(PDO::FETCH_ASSOC)) {
-        $years[] = $row['year']; // This will be the year
-        $emissions[] = $row['total_emission'];
-        $reductions[] = 0; // Initialize reductions to 0 for each year
-    }
-
-    // Fetch data for reductions by year
-    $sqlReductions = "SELECT year, 
-                             SUM(total_cf) AS total_reduction
-                      FROM reduction_calculations
-                      GROUP BY year
-                      ORDER BY year";
-    $stmtReductions = $pdo->prepare($sqlReductions);
-    $stmtReductions->execute();
-
-    while ($row = $stmtReductions->fetch(PDO::FETCH_ASSOC)) {
-        // Ensure that the year exists in the years array
-        $index = array_search($row['year'], $years);
-        if ($index !== false) {
-            // If it exists, add the reduction to the corresponding year
-            $reductions[$index] += $row['total_reduction'];
-        } else {
-            // If it doesn't exist, add a new entry
-            $years[] = $row['year'];
-            $emissions[] = 0; // No emissions for this year
-            $reductions[] = $row['total_reduction'];
-        }
-    }
-    ?>
     <div class="chart-container">
         <canvas id="lineChart"></canvas>
     </div>
+
     <div class="container">
         <!-- show progress bar -->
         <h2 class="section-title"><i class="fas fa-balance-scale"></i> การดำเนินงานเพื่อมุ่งสู่ความเป็นกลางทางคาร์บอน</h2>
@@ -519,23 +454,6 @@ try {
         </div>
 
         <div class="progress-container">
-            <?php
-            // Fetch and calculate the percentages for emissions and reductions
-            $sqlEmissions = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
-            $stmtEmissions = $pdo->prepare($sqlEmissions);
-            $stmtEmissions->execute();
-            $totalEmissions = $stmtEmissions->fetchColumn(); // Total emissions
-
-            $sqlReductions = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations"; // Assuming you have a table for reductions
-            $stmtReductions = $pdo->prepare($sqlReductions);
-            $stmtReductions->execute();
-            $totalReductions = $stmtReductions->fetchColumn(); // Total reductions
-
-            $total = $totalEmissions + $totalReductions; // Total value
-            $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0; // Calculate emission percentage
-            $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0; // Calculate reduction percentage
-            ?>
-
             <!-- Reduction Bar -->
             <div class="progress-bar-fill progress-bar-reduction" style="width: <?php echo number_format($reductionPercentage, 2); ?>%;">
                 <?php echo number_format($reductionPercentage); ?>%
@@ -602,79 +520,47 @@ try {
     <div class="show-carbon">
         <div class="carbon-type">รวมการลดการปล่อยคาร์บอนทั้งหมดในคณะแพทยศาสตร์</div>
         <div class="carbon-value">
-            <?php
-            // Query to get the total carbon reduction
-            $sql = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute();
-            $totalReduction = $stmt->fetchColumn(); // Fetch the total reduction value
-            ?>
-            <span id="carbonCounter">0</span> <!-- We'll animate this -->
-            <input type="hidden" id="finalValue" value="<?php echo $totalReduction; ?>">
+            <span id="carbonCounter">0</span>
+            <input type="hidden" id="finalValue" value="<?php echo $totalReductions; ?>">
         </div>
         <span class="carbon-unit">kg CO2e</span>
     </div>
 
     <!-- month picker -->
     <div class="monthpicker-container">
-        <span class="calendar-icon">
-            <i class="fas fa-calendar-alt"></i>
-        </span>
-        <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
+        <form id="filterForm" action="{{ route('dashboard.reduction') }}" method="GET" class="filter-form">
+            <input type="month" id="monthpicker" name="selected_date" value="{{ request('selected_date') }}" />
+            <input type="hidden" name="scrollPosition" id="scrollPosition" value="" />
+            <button type="submit" class="filter-button">Filter</button>
+        </form>
     </div>
 
-    <!-- bar chart -->
-    <?php
-    // Initialize the variable
-    $totalCF = []; // Ensure this is defined before use
-    $carbonType = []; // Initialize this as well
+    <script>
+        // Save scroll position before form submission
+        document.getElementById('filterForm').addEventListener('submit', function() {
+            document.getElementById('scrollPosition').value = window.scrollY;
+        });
 
-    // Get month and year from POST request
-    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because month is 0-indexed
-    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null; // Default to current year
-
-    try {
-        if ($selectedMonth && $selectedYear) {
-            // Query for specific month and year
-            $sql = "SELECT rt.type, SUM(rc.total_cf) AS total_carbon_footprint
-                    FROM reduction_calculations rc
-                    JOIN reduction_types et ON rc.re_id = rt.re_id
-                    WHERE MONTH(rc.month) = :month AND YEAR(rc.year) = :year
-                    GROUP BY rt.type";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-            $stmt->bindParam(':year', $selectedYear, PDO::PARAM_INT);
-        } else {
-            // Query for overall data if no date is selected
-            $sql = "SELECT rt.type, SUM(rc.total_cf) AS total_carbon_footprint
-                    FROM reduction_calculations rc
-                    JOIN reduction_types rt ON rc.re_id = rt.re_id
-                    GROUP BY rt.type";
-
-            $stmt = $pdo->prepare($sql);
-        }
-
-        $stmt->execute();
-
-        if ($stmt->rowCount() > 0) {
-            $totalCF = [];
-            $carbonType = [];
-
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $totalCF[] = $row["total_carbon_footprint"];
-                $carbonType[] = $row["type"];
+        // Restore scroll position after page load
+        window.addEventListener('load', function() {
+            const scrollPosition = new URLSearchParams(window.location.search).get('scrollPosition');
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition));
             }
-        } else {
-            echo "No records matching your query were found.";
-        }
-    } catch (PDOException $e) {
-        die("ERROR: Could not execute $sql. " . $e->getMessage());
-    }
+        });
 
-    // Close connection
-    unset($pdo);
-    ?>
+        // Set default value to current month if no filter is applied
+        window.addEventListener('DOMContentLoaded', (event) => {
+            if (!document.getElementById('monthpicker').value) {
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const year = now.getFullYear();
+                document.getElementById('monthpicker').value = `${year}-${month}`;
+            }
+        });
+    </script>
+
+    <!-- bar chart -->
     <div class="bar-container">
         <canvas id="barChart" style="width:100%;max-width:1200px"></canvas>
     </div>
@@ -776,42 +662,6 @@ try {
             LineConfig // Use LineConfig for the chart
         );
 
-        // Month picker initialization
-        $(document).ready(function() {
-            $("#monthpicker").datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: 'MM yy',
-                yearRange: "2020:2030",
-                onClose: function(dateText, inst) {
-                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                    $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
-                }
-            });
-        });
-
-        // Function to fetch data based on selected month and year
-        function fetchData(month, year) {
-            $.ajax({
-                url: 'path/to/your/php/script.php', // Update with the correct path to your PHP script
-                type: 'POST',
-                data: {
-                    month: month,
-                    year: year
-                },
-                success: function(response) {
-                    // Assuming response is JSON containing totalCF and carbonType
-                    const data = JSON.parse(response);
-                    updateChart(data.totalCF, data.carbonType); // Call function to update the chart
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-            });
-        }
-
         // Bar chart setup
         const ctx = document.getElementById('barChart').getContext('2d');
 
@@ -819,30 +669,12 @@ try {
         const totalCF = <?php echo json_encode($totalCF); ?>;
         const carbonType = <?php echo json_encode($carbonType); ?>;
 
-        // Combine and sort data
-        const combinedData = carbonType.map((type, index) => ({
-            type: type,
-            value: totalCF[index]
-        }));
-
-        // Sort combined data by value in descending order
-        combinedData.sort((a, b) => b.value - a.value);
-
-        // Extract sorted labels and data
-        const sortedCarbonType = combinedData.map(item => item.type);
-        const sortedTotalCF = combinedData.map(item => item.value);
-
-        // Create gradient
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400); // Adjust the height as needed
-        gradient.addColorStop(0, '#2c7873'); // Color for the biggest bar
-        gradient.addColorStop(1, '#20B2AA'); // Color for the smallest bar
-
         const data = {
-            labels: sortedCarbonType,
+            labels: carbonType,
             datasets: [{
-                label: 'Carbon Footprint', // Add a label for the dataset
-                backgroundColor: gradient, // Use the gradient for the bars
-                data: sortedTotalCF
+                label: 'Carbon Footprint',
+                backgroundColor: '#20B2AA',
+                data: totalCF
             }]
         };
 

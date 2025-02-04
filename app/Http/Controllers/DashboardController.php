@@ -90,4 +90,88 @@ class DashboardController extends Controller
             'carbonType' => $carbonType
         ]);
     }
+
+    public function showReductionDashboard(Request $request)
+    {
+        //Reduction by year
+        $emissionsData = DB::table('emission_calculations')
+            ->select(DB::raw('year, SUM(total_cf) as total_emission'))
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+
+        $years = [];
+        $emissions = [];
+        $reductions = [];
+
+        foreach ($emissionsData as $row) {
+            $years[] = $row->year;
+            $emissions[] = $row->total_emission;
+            $reductions[] = 0;
+        }
+
+        // Get reductions by year
+        $reductionsData = DB::table('reduction_calculations')
+            ->select(DB::raw('year, SUM(total_cf) as total_reduction'))
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+
+        foreach ($reductionsData as $row) {
+            $index = array_search($row->year, $years);
+            if ($index !== false) {
+                $reductions[$index] += $row->total_reduction;
+            } else {
+                $years[] = $row->year;
+                $emissions[] = 0;
+                $reductions[] = $row->total_reduction;
+            }
+        }
+
+        // Calculate progress percentages
+        $totalEmissions = DB::table('emission_calculations')->sum('total_cf');
+        $totalReductions = DB::table('reduction_calculations')->sum('total_cf');
+        $total = $totalEmissions + $totalReductions;
+
+        $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0;
+        $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0;
+
+        // Get carbon footprint by type with date filter
+        $selectedDate = $request->input('selected_date');
+
+        $carbonFootprintQuery = DB::table('reduction_calculations as rc')
+            ->join('reduction_types as rt', 'rc.re_id', '=', 'rt.re_id')
+            ->select('rt.type', DB::raw('SUM(rc.total_cf) as total_carbon_footprint'));
+
+        if ($selectedDate) {
+            $year = date('Y', strtotime($selectedDate));
+            $month = (int)date('m', strtotime($selectedDate));
+
+            $carbonFootprintQuery->where('rc.year', $year)
+                ->where('rc.month', $month);
+        }
+
+        $carbonFootprintData = $carbonFootprintQuery->groupBy('rt.type')
+            ->orderByDesc('total_carbon_footprint')
+            ->get();
+
+        $totalCF = [];
+        $carbonType = [];
+
+        foreach ($carbonFootprintData as $row) {
+            $totalCF[] = floatval($row->total_carbon_footprint);
+            $carbonType[] = $row->type;
+        }
+
+        return view('dashboard-re', [
+            'years' => $years,
+            'emissions' => $emissions,
+            'reductions' => $reductions,
+            'totalReductions' => $totalReductions,
+            'emissionPercentage' => $emissionPercentage,
+            'reductionPercentage' => $reductionPercentage,
+            'totalCF' => $totalCF,
+            'carbonType' => $carbonType
+        ]);
+    }
 }

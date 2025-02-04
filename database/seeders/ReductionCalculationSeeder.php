@@ -7,6 +7,28 @@ use Illuminate\Support\Facades\DB;
 
 class ReductionCalculationSeeder extends Seeder
 {
+    private function getSeasonalMultiplier($month)
+    {
+        // Solar and energy efficiency vary by season
+        switch ($month) {
+            case 3: case 4: case 5: // Spring
+                return 1.1;
+            case 6: case 7: case 8: // Summer
+                return 1.4;
+            case 9: case 10: case 11: // Fall
+                return 0.9;
+            case 12: case 1: case 2: // Winter
+                return 0.7;
+        }
+    }
+
+    private function getYearlyGrowthMultiplier($year)
+    {
+        // 15% year-over-year growth in reduction efforts from base year 2021
+        // Higher growth rate than emissions as sustainability efforts increase
+        return 1 + (($year - 2021) * 0.15);
+    }
+
     public function run(): void
     {
         // Get emission factors from sub-types
@@ -15,82 +37,92 @@ class ReductionCalculationSeeder extends Seeder
             ->toArray();
         
         $calculations = [];
-        
-        // Sample user IDs (assuming we have users with IDs 1-5)
         $userIds = [1, 2, 3, 4, 5];
+        $years = [2021, 2022, 2023, 2024];
         
-        // Generate data for the last 12 months
-        for ($month = 1; $month <= 12; $month++) {
-            foreach ($userIds as $userId) {
-                // LED Lighting reductions
-                $amount = rand(500, 1000); // Monthly energy saved in kWh
-                $calculations[] = [
-                    're_id' => 1, // Energy Efficiency
-                    're_sub_id' => 1, // LED Lighting
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $reductionFactors[1], // Calculate total carbon footprint reduction
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+        foreach ($years as $year) {
+            $yearMultiplier = $this->getYearlyGrowthMultiplier($year);
+            
+            for ($month = 1; $month <= 12; $month++) {
+                $seasonalMultiplier = $this->getSeasonalMultiplier($month);
+                
+                foreach ($userIds as $userId) {
+                    // LED Lighting reductions - affected by seasonal daylight
+                    $baseAmount = rand(500, 1000);
+                    $amount = round($baseAmount * $seasonalMultiplier * $yearMultiplier);
+                    $calculations[] = [
+                        're_id' => 1,
+                        're_sub_id' => 1,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $reductionFactors[1],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Electric Vehicle usage
-                $amount = rand(50, 150); // Monthly fuel avoided in liters
-                $calculations[] = [
-                    're_id' => 2, // Sustainable Transportation
-                    're_sub_id' => 3, // Electric Vehicle
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $reductionFactors[3],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Electric Vehicle usage - consistent growth
+                    $baseAmount = rand(50, 150);
+                    $amount = round($baseAmount * $yearMultiplier);
+                    $calculations[] = [
+                        're_id' => 2,
+                        're_sub_id' => 3,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $reductionFactors[3],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Medical Waste Recycling
-                $amount = rand(50, 150); // Monthly recycled waste in kg
-                $calculations[] = [
-                    're_id' => 3, // Waste Reduction
-                    're_sub_id' => 5, // Medical Waste Recycling
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $reductionFactors[5],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Medical Waste Recycling - steady increase
+                    $baseAmount = rand(50, 150);
+                    $amount = round($baseAmount * $yearMultiplier);
+                    $calculations[] = [
+                        're_id' => 3,
+                        're_sub_id' => 5,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $reductionFactors[5],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Water-Efficient Fixtures
-                $amount = rand(100, 300); // Monthly water saved in m³
-                $calculations[] = [
-                    're_id' => 4, // Water Conservation
-                    're_sub_id' => 7, // Water-Efficient Fixtures
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $reductionFactors[7],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Water-Efficient Fixtures - more savings in summer
+                    $baseAmount = rand(100, 300);
+                    $waterMultiplier = ($month >= 6 && $month <= 8) ? 1.3 : 1.0;
+                    $amount = round($baseAmount * $waterMultiplier * $yearMultiplier);
+                    $calculations[] = [
+                        're_id' => 4,
+                        're_sub_id' => 7,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $reductionFactors[7],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Solar Panel Installation
-                $amount = rand(1000, 2000); // Monthly energy generated in kWh
-                $calculations[] = [
-                    're_id' => 5, // Green Technology
-                    're_sub_id' => 9, // Solar Panel Installation
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $reductionFactors[9],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Solar Panel Installation - highly seasonal
+                    $baseAmount = rand(1000, 2000);
+                    $amount = round($baseAmount * $seasonalMultiplier * $yearMultiplier);
+                    $calculations[] = [
+                        're_id' => 5,
+                        're_sub_id' => 9,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $reductionFactors[9],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
             }
         }
 

@@ -7,6 +7,28 @@ use Illuminate\Support\Facades\DB;
 
 class EmissionCalculationSeeder extends Seeder
 {
+    private function getSeasonalMultiplier($month)
+    {
+        // Higher usage in summer (air conditioning) and winter (heating)
+        // Months: 1 = January, 12 = December
+        switch ($month) {
+            case 3: case 4: case 5: // Spring
+                return 0.8;
+            case 6: case 7: case 8: // Summer
+                return 1.3;
+            case 9: case 10: case 11: // Fall
+                return 0.9;
+            case 12: case 1: case 2: // Winter
+                return 1.2;
+        }
+    }
+
+    private function getYearlyGrowthMultiplier($year)
+    {
+        // 5% year-over-year growth from base year 2021
+        return 1 + (($year - 2021) * 0.05);
+    }
+
     public function run(): void
     {
         // Get emission factors from sub-types
@@ -15,82 +37,92 @@ class EmissionCalculationSeeder extends Seeder
             ->toArray();
         
         $calculations = [];
-        
-        // Sample user IDs (assuming we have users with IDs 1-5)
         $userIds = [1, 2, 3, 4, 5];
+        $years = [2021, 2022, 2023, 2024];
         
-        // Generate data for the last 12 months
-        for ($month = 1; $month <= 12; $month++) {
-            foreach ($userIds as $userId) {
-                // Electricity consumption calculations
-                $amount = rand(5000, 8000); // Monthly electricity usage in kWh
-                $calculations[] = [
-                    'em_id' => 1, // Electricity Consumption
-                    'em_sub_id' => 1, // Grid Electricity
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $emissionFactors[1], // Calculate total carbon footprint
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+        foreach ($years as $year) {
+            $yearMultiplier = $this->getYearlyGrowthMultiplier($year);
+            
+            for ($month = 1; $month <= 12; $month++) {
+                $seasonalMultiplier = $this->getSeasonalMultiplier($month);
+                
+                foreach ($userIds as $userId) {
+                    // Electricity consumption calculations - affected by seasons
+                    $baseAmount = rand(5000, 8000);
+                    $amount = round($baseAmount * $seasonalMultiplier * $yearMultiplier);
+                    $calculations[] = [
+                        'em_id' => 1,
+                        'em_sub_id' => 1,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $emissionFactors[1],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Transportation calculations
-                $amount = rand(100, 300); // Monthly fuel consumption in liters
-                $calculations[] = [
-                    'em_id' => 2, // Transportation
-                    'em_sub_id' => 3, // Diesel Vehicle
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $emissionFactors[3],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Transportation - slightly lower in summer months
+                    $baseAmount = rand(100, 300);
+                    $amount = round($baseAmount * (($month >= 6 && $month <= 8) ? 0.9 : 1.0) * $yearMultiplier);
+                    $calculations[] = [
+                        'em_id' => 2,
+                        'em_sub_id' => 3,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $emissionFactors[3],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Medical waste calculations
-                $amount = rand(200, 500); // Monthly medical waste in kg
-                $calculations[] = [
-                    'em_id' => 3, // Waste Management
-                    'em_sub_id' => 5, // Medical Waste
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $emissionFactors[5],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Medical waste - consistent throughout the year with slight growth
+                    $baseAmount = rand(200, 500);
+                    $amount = round($baseAmount * $yearMultiplier);
+                    $calculations[] = [
+                        'em_id' => 3,
+                        'em_sub_id' => 5,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $emissionFactors[5],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Water consumption calculations
-                $amount = rand(1000, 2000); // Monthly water usage in m³
-                $calculations[] = [
-                    'em_id' => 4, // Water Consumption
-                    'em_sub_id' => 7, // Tap Water
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $emissionFactors[7],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Water consumption - higher in summer months
+                    $baseAmount = rand(1000, 2000);
+                    $waterMultiplier = ($month >= 6 && $month <= 8) ? 1.3 : 1.0;
+                    $amount = round($baseAmount * $waterMultiplier * $yearMultiplier);
+                    $calculations[] = [
+                        'em_id' => 4,
+                        'em_sub_id' => 7,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $emissionFactors[7],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
 
-                // Medical equipment usage calculations
-                $amount = rand(80, 160); // Monthly usage hours
-                $calculations[] = [
-                    'em_id' => 5, // Medical Equipment
-                    'em_sub_id' => 9, // X-ray Machine
-                    'user_id' => $userId,
-                    'amount' => $amount,
-                    'total_cf' => $amount * $emissionFactors[9],
-                    'month' => $month,
-                    'year' => 2024,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    // Medical equipment - consistent with slight yearly growth
+                    $baseAmount = rand(80, 160);
+                    $amount = round($baseAmount * $yearMultiplier);
+                    $calculations[] = [
+                        'em_id' => 5,
+                        'em_sub_id' => 9,
+                        'user_id' => $userId,
+                        'amount' => $amount,
+                        'total_cf' => $amount * $emissionFactors[9],
+                        'month' => $month,
+                        'year' => $year,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
             }
         }
 

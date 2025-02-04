@@ -1,18 +1,3 @@
-<?php
-
-$host = "mysql";
-$username = "root";
-$password = "rootpassword";
-$database = "cf";
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
-    echo "";
-} catch (PDOException $e) {
-    die("ERROR: Could not connect. " . $e->getMessage());
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -430,51 +415,9 @@ try {
     </div>
 
     <!-- line chart -->
-    <?php
-    // Fetch data for emissions by year
-    $sqlEmissions = "SELECT year, 
-                             SUM(total_cf) AS total_emission
-                      FROM emission_calculations
-                      GROUP BY year
-                      ORDER BY YEAR";
-
-    $stmtEmissions = $pdo->prepare($sqlEmissions);
-    $stmtEmissions->execute();
-
-    $years = [];
-    $emissions = [];
-    $reductions = [];
-
-    while ($row = $stmtEmissions->fetch(PDO::FETCH_ASSOC)) {
-        $years[] = $row['year'];
-        $emissions[] = $row['total_emission'];
-        $reductions[] = 0;
-    }
-
-    // Fetch data for reductions by year
-    $sqlReductions = "SELECT year, 
-                             SUM(total_cf) AS total_reduction
-                      FROM reduction_calculations
-                      GROUP BY year
-                      ORDER BY year";
-    $stmtReductions = $pdo->prepare($sqlReductions);
-    $stmtReductions->execute();
-
-    while ($row = $stmtReductions->fetch(PDO::FETCH_ASSOC)) {
-        $index = array_search($row['year'], $years);
-        if ($index !== false) {
-            $reductions[$index] += $row['total_reduction'];
-        } else {
-            $years[] = $row['year'];
-            $emissions[] = 0;
-            $reductions[] = $row['total_reduction'];
-        }
-    }
-    ?>
     <div class="chart-container">
         <canvas id="lineChart"></canvas>
     </div>
-
 
     <div class="container">
         <!-- show progress bar -->
@@ -486,31 +429,14 @@ try {
         </div>
 
         <div class="progress-container">
-            <?php
-            // Fetch and calculate the percentages for emissions and reductions
-            $sqlEmissions = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
-            $stmtEmissions = $pdo->prepare($sqlEmissions);
-            $stmtEmissions->execute();
-            $totalEmissions = $stmtEmissions->fetchColumn(); // Total emissions
-
-            $sqlReductions = "SELECT SUM(total_cf) AS total_reduction FROM reduction_calculations"; // Assuming you have a table for reductions
-            $stmtReductions = $pdo->prepare($sqlReductions);
-            $stmtReductions->execute();
-            $totalReductions = $stmtReductions->fetchColumn(); // Total reductions
-
-            $total = $totalEmissions + $totalReductions; // Total value
-            $emissionPercentage = $total ? ($totalEmissions / $total) * 100 : 0; // Calculate emission percentage
-            $reductionPercentage = $total ? ($totalReductions / $total) * 100 : 0; // Calculate reduction percentage
-            ?>
-
             <!-- Reduction Bar -->
-            <div class="progress-bar-fill progress-bar-reduction" style="width: <?php echo number_format($reductionPercentage, 2); ?>%;">
-                <?php echo number_format($reductionPercentage); ?>%
+            <div class="progress-bar-fill progress-bar-reduction" style="width: {{ number_format($reductionPercentage, 2) }}%;">
+                {{ number_format($reductionPercentage) }}%
             </div>
 
             <!-- Emission Bar -->
-            <div class="progress-bar-fill progress-bar-emission" style="width: <?php echo number_format($emissionPercentage, 2); ?>%;">
-                <?php echo number_format($emissionPercentage); ?>%
+            <div class="progress-bar-fill progress-bar-emission" style="width: {{ number_format($emissionPercentage, 2) }}%;">
+                {{ number_format($emissionPercentage) }}%
             </div>
         </div>
 
@@ -535,51 +461,38 @@ try {
     </div>
 
     <!-- show overall carbon emission -->
-    <script>
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-
-                // Use easing function for smoother animation
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const currentNumber = progress * (end - start) + start;
-
-                obj.innerHTML = currentNumber.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        // Start the animation when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            const carbonCounter = document.getElementById('carbonCounter');
-            const finalValue = parseFloat(document.getElementById('finalValue').value);
-            animateValue(carbonCounter, 0, finalValue, 2000); // 2000ms = 2 seconds duration
-        });
-    </script>
     <div class="show-carbon">
         <div class="carbon-type">รวมการปล่อยคาร์บอนทั้งหมดในคณะแพทยศาสตร์</div>
         <div class="carbon-value">
-            <?php
-            // Query to get the total carbon emissions
-            $sql = "SELECT SUM(total_cf) AS total_emission FROM emission_calculations";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute();
-            $totalEmission = $stmt->fetchColumn(); // Fetch the total emission value
-            ?>
             <span id="carbonCounter">0</span>
-            <input type="hidden" id="finalValue" value="<?php echo $totalEmission; ?>">
+            <input type="hidden" id="finalValue" value="{{ $totalEmissions }}">
         </div>
         <span class="carbon-unit">kg CO2e</span>
     </div>
+
+    <!-- Add this script right after the show-carbon div -->
+    <script>
+        // Counter animation
+        const counter = document.getElementById('carbonCounter');
+        const finalValue = parseFloat(document.getElementById('finalValue').value);
+        const duration = 2000; // Animation duration in milliseconds
+        const steps = 50; // Number of steps in the animation
+        const stepValue = finalValue / steps;
+        let currentValue = 0;
+        let currentStep = 0;
+
+        const animate = () => {
+            currentStep++;
+            currentValue = Math.min(stepValue * currentStep, finalValue);
+            counter.textContent = Math.floor(currentValue).toLocaleString();
+
+            if (currentStep < steps) {
+                setTimeout(animate, duration / steps);
+            }
+        };
+
+        animate();
+    </script>
 
     <!-- month picker -->
     <div class="monthpicker-container">
@@ -587,62 +500,18 @@ try {
     </div>
 
     <!-- bar chart -->
-    <?php
-    // Check if month and year are provided
-    $selectedMonth = isset($_POST['month']) ? (int)$_POST['month'] + 1 : null; // +1 because JS months are 0-indexed
-    $selectedYear = isset($_POST['year']) ? (int)$_POST['year'] : null;
-
-    try {
-        if ($selectedMonth && $selectedYear) {
-            // Query for specific month and year
-            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint 
-                    FROM emission_calculations ec 
-                    JOIN emission_types et ON ec.em_id = et.em_id 
-                    WHERE MONTH(ec.month) = :month 
-                    AND YEAR(ec.year) = :year 
-                    GROUP BY et.type 
-                    ORDER BY total_carbon_footprint DESC";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-            $stmt->bindParam(':year', $selectedYear, PDO::PARAM_INT);
-        } else {
-            // Query for all-time data
-            $sql = "SELECT et.type, SUM(ec.total_cf) AS total_carbon_footprint 
-                    FROM emission_calculations ec 
-                    JOIN emission_types et ON ec.em_id = et.em_id 
-                    GROUP BY et.type 
-                    ORDER BY total_carbon_footprint DESC";
-
-            $stmt = $pdo->prepare($sql);
-        }
-
-        $stmt->execute();
-
-        $totalCF = [];
-        $carbonType = [];
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $totalCF[] = floatval($row["total_carbon_footprint"]);
-            $carbonType[] = $row["type"];
-        }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-    ?>
     <div class="bar-container">
         <canvas id="barChart" onclick="location.href='emission-detail'"></canvas>
     </div>
-
 
     <script>
         // Line chart setup
         const lineCtx = document.getElementById('lineChart').getContext('2d');
 
         // Setup Block
-        const years = <?php echo json_encode($years); ?>; // Use years for x-axis labels
-        const emissions = <?php echo json_encode($emissions); ?>;
-        const reductions = <?php echo json_encode($reductions); ?>;
+        const years = @json($years);
+        const emissions = @json($emissions);
+        const reductions = @json($reductions);
 
         // Create datasets
         const datasets = [{
@@ -734,8 +603,8 @@ try {
         // Bar chart setup
         const barCtx = document.getElementById('barChart').getContext('2d');
 
-        const totalCF = <?php echo json_encode($totalCF); ?>;
-        const carbonType = <?php echo json_encode($carbonType); ?>;
+        const totalCF = @json($totalCF);
+        const carbonType = @json($carbonType);
 
         // Create bar chart data (no sorting)
         const barData = {
@@ -825,6 +694,5 @@ try {
         <p>This research was conducted at the Faculty of Medicine, Chiang Mai University.</p>
     </footer>
 </body>
-
 
 </html>

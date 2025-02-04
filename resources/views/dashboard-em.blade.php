@@ -526,9 +526,35 @@
     <div class="monthpicker-container">
         <form id="filterForm" action="{{ route('dashboard.emission') }}" method="GET" class="filter-form">
             <input type="month" id="monthpicker" name="selected_date" value="{{ request('selected_date') }}" />
+            <input type="hidden" name="scrollPosition" id="scrollPosition" value="" />
             <button type="submit" class="filter-button">Filter</button>
         </form>
     </div>
+
+    <script>
+        // Save scroll position before form submission
+        document.getElementById('filterForm').addEventListener('submit', function() {
+            document.getElementById('scrollPosition').value = window.scrollY;
+        });
+
+        // Restore scroll position after page load
+        window.addEventListener('load', function() {
+            const scrollPosition = new URLSearchParams(window.location.search).get('scrollPosition');
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition));
+            }
+        });
+
+        // Set default value to current month if no filter is applied
+        window.addEventListener('DOMContentLoaded', (event) => {
+            if (!document.getElementById('monthpicker').value) {
+                const now = new Date();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const year = now.getFullYear();
+                document.getElementById('monthpicker').value = `${year}-${month}`;
+            }
+        });
+    </script>
 
     <!-- bar chart -->
     <div class="bar-container">
@@ -710,16 +736,6 @@
             barCtx,
             barConfig
         );
-
-        // Set default value to current month if no filter is applied
-        window.addEventListener('DOMContentLoaded', (event) => {
-            if (!document.getElementById('monthpicker').value) {
-                const now = new Date();
-                const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                const year = now.getFullYear();
-                document.getElementById('monthpicker').value = `${year}-${month}`;
-            }
-        });
     </script>
 
     <footer class="footer">

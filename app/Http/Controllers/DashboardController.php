@@ -93,7 +93,7 @@ class DashboardController extends Controller
 
     public function showReductionDashboard(Request $request)
     {
-        //Reduction by year
+        //emission by year
         $emissionsData = DB::table('emission_calculations')
             ->select(DB::raw('year, SUM(total_cf) as total_emission'))
             ->groupBy('year')
@@ -110,7 +110,7 @@ class DashboardController extends Controller
             $reductions[] = 0;
         }
 
-        // Get reductions by year
+        //reductions by year
         $reductionsData = DB::table('reduction_calculations')
             ->select(DB::raw('year, SUM(total_cf) as total_reduction'))
             ->groupBy('year')
@@ -174,4 +174,59 @@ class DashboardController extends Controller
             'carbonType' => $carbonType
         ]);
     }
+
+    public function showEmissionDetails(Request $request)
+{
+    $selectedDate = $request->input('selected_date');
+    
+    // Define chart types to match your HTML IDs
+    $chartTypes = [
+        'CarbonFootprintจากการเผาไหม้เชื้อเพลิง',
+        'CarbonFootprintจากการรั่วไหลและอื่นๆ',
+        'CarbonFootprintจากการใช้พลังงาน',
+        'CarbonFootprintทางอ้อมอื่นๆ'
+    ];
+    
+    // Base query for emissions detail
+    $query = DB::table('emission_types as et')
+        ->join('emission_sub_types as est', 'et.em_id', '=', 'est.em_id')
+        ->leftJoin('emission_calculations as ec', 'est.em_sub_id', '=', 'ec.em_sub_id');
+    
+    // Apply date filter if selected
+    if ($selectedDate) {
+        $year = date('Y', strtotime($selectedDate));
+        $month = (int)date('m', strtotime($selectedDate));
+        
+        $query->where('ec.year', $year)
+              ->where('ec.month', $month);
+    }
+    
+    $emissionsDetail = $query
+        ->select(DB::raw('et.type as emission_type, est.sub_type, COALESCE(SUM(ec.total_cf), 0) as total_cf'))
+        ->whereIn('et.type', [
+            'Carbon Footprint จากการเผาไหม้เชื้อเพลิง',
+            'Carbon Footprint จากการรั่วไหลและอื่นๆ',
+            'Carbon Footprint จากการใช้พลังงาน',
+            'Carbon Footprint ทางอ้อมอื่นๆ'
+        ])
+        ->groupBy('et.type', 'est.sub_type')
+        ->orderByDesc('total_cf')
+        ->get();
+
+    // Prepare data for each chart type
+    $chartLabels = [];
+    $chartValues = [];
+
+    foreach ($emissionsDetail as $row) {
+        $type = $row->emission_type;
+        $chartLabels[$type][] = $row->sub_type;
+        $chartValues[$type][] = floatval($row->total_cf);
+    }
+
+    return view('em-detail', [
+        'chartLabels' => $chartLabels,
+        'chartValues' => $chartValues,
+        'chartTypes' => $chartTypes
+    ]);
+}
 }

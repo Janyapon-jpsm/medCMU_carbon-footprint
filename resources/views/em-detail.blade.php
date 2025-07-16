@@ -7,7 +7,6 @@
     <title>Carbon Footprint Emission</title>
     <link rel="icon" href="\images\leaf-solid.svg" type="image/png">
 
-    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
     <!-- Load jQuery first -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -18,10 +17,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-
-    <script src="monthpicker.js"></script>
-
-    <link rel="stylesheet" href="/path/to/cdn/jquery-ui.min.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -76,48 +71,41 @@
         }
 
         .monthpicker-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 2rem auto;
-            position: relative;
-            text-align: center;
-            max-width: 500px;
-        }
+        position: sticky;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 2rem auto;
+        max-width: 300px;
+    }
 
-        #monthpicker {
-            width: 100%;
-            padding: 1rem 3rem;
-            border: 2px solid #20B2AA;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            text-align: center;
-            outline: none;
-            background-color: white;
-            color: #2c3e50;
-            cursor: pointer;
-            font-family: 'Kanit', Arial, sans-serif;
-        }
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
 
-        .calendar-icon {
-            position: absolute;
-            left: 1rem;
-            color: #20B2AA;
-            font-size: 1.2rem;
-            pointer-events: none;
-        }
+    .filter-button {
+        padding: 8px 20px;
+        background-color: #20B2AA;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
 
-        /* Basic datepicker styling */
-        .ui-datepicker {
-            padding: 1rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+    .filter-button:hover {
+        background-color: #01696E;
+    }
 
-        .ui-datepicker-calendar {
-            display: none;
-        }
+    #monthpicker {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
 
         .content-sec {
             display: flex;
@@ -226,53 +214,14 @@
 
     <!-- month picker -->
     <div class="monthpicker-container">
-        <span class="calendar-icon">
-            <i class="fas fa-calendar-alt"></i>
-        </span>
-        <input id="monthpicker" type="text" placeholder="เลือกเดือนและปี" readonly>
-    </div>
+    <form id="filterForm" action="{{ route('dashboard.em-detail') }}" method="GET" class="filter-form">
+        <input type="month" id="monthpicker" name="selected_date" value="{{ request('selected_date') }}" />
+        <input type="hidden" name="scrollPosition" id="scrollPosition" value="" />
+        <button type="submit" class="filter-button">Filter</button>
+    </form>
+</div>
+    
 
-    <?php
-    $chartData = [];
-
-    $sql = "SELECT 
-            et.type AS emission_type,
-            est.sub_type,
-            COALESCE(SUM(ec.total_cf), 0) AS total_cf
-        FROM 
-            emission_types et
-        JOIN 
-            emission_sub_types est ON et.em_id = est.em_id
-        LEFT JOIN 
-            emission_calculations ec ON est.em_sub_id = ec.em_sub_id
-        WHERE 
-            et.type IN (
-                'Carbon Footprint จากการเผาไหม้เชื้อเพลิง', 
-                'Carbon Footprint จากการรั่วไหลและอื่นๆ', 
-                'Carbon Footprint จากการใช้พลังงาน', 
-                'Carbon Footprint ทางอ้อมอื่นๆ'
-            )
-        GROUP BY 
-            et.type, est.sub_type
-        ORDER BY 
-            CASE et.type
-                WHEN 'Carbon Footprint จากการเผาไหม้เชื้อเพลิง' THEN 1
-                WHEN 'Carbon Footprint จากการรั่วไหลและอื่นๆ' THEN 2
-                WHEN 'Carbon Footprint จากการใช้พลังงาน' THEN 3
-                WHEN 'Carbon Footprint ทางอ้อมอื่นๆ' THEN 4
-            END, 
-            total_cf DESC";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $chartData[$row['emission_type']][] = [
-            'subtype' => $row['sub_type'],
-            'total_cf' => floatval($row['total_cf'])
-        ];
-    }
-    ?>
 
     <div class="content-sec">
         <h2 class="title">Carbon Footprint จากการเผาไหม้เชื้อเพลิง</h2>
@@ -346,79 +295,119 @@
     </div>
 
     <script>
-        // Month picker initialization
-        $("#monthpicker").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            showButtonPanel: true,
-            dateFormat: 'MM yy',
-            onClose: function(dateText, inst) {
-                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                $(this).val($.datepicker.formatDate('MM yy', new Date(year, month, 1)));
-            }
-        });
+    // Get the elements based on your HTML structure
+    const chartIds = ['CombustionChart', 'LeakageChart', 'EnergyChart', 'IndirectChart'];
+    const chartTypes = [
+        'Carbon Footprint จากการเผาไหม้เชื้อเพลิง',
+        'Carbon Footprint จากการรั่วไหลและอื่นๆ',
+        'Carbon Footprint จากการใช้พลังงาน',
+        'Carbon Footprint ทางอ้อมอื่นๆ'
+    ];
+    
+    const chartLabels = @json($chartLabels);
+    const chartValues = @json($chartValues);
+    const charts = [];
 
-        $("#monthpicker").focus(function() {
-            $(".ui-datepicker-calendar").hide();
-            $("#ui-datepicker-div").position({
-                my: "center top",
-                at: "center bottom",
-                of: $(this)
-            });
-        });
+    // Create and render each chart
+    chartIds.forEach((chartId, index) => {
+        const ctx = document.getElementById(chartId).getContext('2d');
+        const type = chartTypes[index];
+        
+        const data = {
+            labels: chartLabels[type] || [],
+            datasets: [{
+                label: 'Carbon Footprint (kg CO2e)',
+                backgroundColor: '#20B2AA',
+                data: chartValues[type] || []
+            }]
+        };
 
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const chartData = <?php echo json_encode($chartData); ?>;
-
-            function createHorizontalBarChart(ctx, labels, values) {
-                return new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Carbon Footprint (kg CO2e)',
-                            data: values,
-                            backgroundColor: 'rgba(32, 178, 170, 0.7)',
-                            borderColor: '#01696E',
-                            borderWidth: 1
-                        }]
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
                     },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                display: false // Hide the title
+                    title: {
+                        display: true,
+                        text: type,
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Carbon Footprint (kg CO2e)',
+                            font: {
+                                weight: 'bold'
                             }
                         },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Carbon Footprint (kg CO2e)'
-                                }
+                        ticks: {
+                            callback: function(value) {
+                                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            },
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            lineWidth: 1
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Emission Sources',
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
                             }
                         }
                     }
-                });
+                }
             }
+        };
 
-            // Create charts for each emission type
-            Object.keys(chartData).forEach((emissionType, index) => {
-                const chartId = ['CombustionChart', 'LeakageChart', 'EnergyChart', 'IndirectChart'][index];
-                const ctx = document.getElementById(chartId).getContext('2d');
+        charts.push(new Chart(ctx, config));
+    });
 
-                const labels = chartData[emissionType].map(item => item.subtype);
-                const values = chartData[emissionType].map(item => item.total_cf);
+    // Remove the automatic form submission on date change
+    // Handle form submission only when Filter button is clicked
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        const selectedDate = document.getElementById('monthpicker').value;
+        const form = this;
 
-                createHorizontalBarChart(ctx, labels, values, emissionType);
-            });
-        });
-    </script>
+        // Save current scroll position
+        document.getElementById('scrollPosition').value = window.pageYOffset;
+        
+        // Submit the form
+        form.submit();
+    });
+
+    // Restore scroll position after page load if available
+    window.onload = function() {
+        const scrollPosition = document.getElementById('scrollPosition').value;
+        if (scrollPosition) {
+            window.scrollTo(0, parseInt(scrollPosition));
+        }
+    };
+</script>
 
     <footer class="footer">
         <p>© 2024 Janyapon Saingam. All rights reserved.</p>

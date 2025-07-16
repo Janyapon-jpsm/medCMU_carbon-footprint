@@ -13,6 +13,5 @@ Route::get('/carbon-footprint-MedCMU-dashboard-em', [DashboardController::class,
 Route::get('/carbon-footprint-MedCMU-dashboard-re', [DashboardController::class, 'showReductionDashboard'])
     ->name('dashboard.reduction');
 
-Route::get('/emission-detail', function () {
-    return view('em-detail');
-});
+Route::get('/emission-detail', [DashboardController::class, 'showEmissionDetails'])
+    ->name('dashboard.em-detail');

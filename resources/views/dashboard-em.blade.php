@@ -458,13 +458,13 @@
 
         <div class="progress-container">
             <!-- Reduction Bar -->
-            <div class="progress-bar-fill progress-bar-reduction" style="width: {{ number_format($reductionPercentage, 2) }}%;">
-                {{ number_format($reductionPercentage) }}%
+             <div class="progress-bar-fill progress-bar-reduction" style="width: <?php echo number_format($reductionPercentage, 2); ?>%;">
+                <?php echo number_format($reductionPercentage); ?>%
             </div>
 
             <!-- Emission Bar -->
-            <div class="progress-bar-fill progress-bar-emission" style="width: {{ number_format($emissionPercentage, 2) }}%;">
-                {{ number_format($emissionPercentage) }}%
+            <div class="progress-bar-fill progress-bar-emission" style="width: <?php echo number_format($emissionPercentage, 2); ?>%;">
+                <?php echo number_format($emissionPercentage); ?>%
             </div>
         </div>
 

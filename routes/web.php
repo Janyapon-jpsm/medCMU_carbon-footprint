@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
+Route::get('/',[DashboardController::class, 'showEmissionDashboard'], function () {
     return view('dashboard-em');
 });
 
